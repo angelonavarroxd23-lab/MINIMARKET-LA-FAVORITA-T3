@@ -1,0 +1,456 @@
+{
+ "vistas": [
+  {
+   "id": "V01",
+   "titulo": "Stock consolidado por producto",
+   "enunciado": "El cajero y el administrador necesitan ver, en una sola consulta, cuántas unidades hay de cada producto sumando todos sus lotes y si el producto está agotado, en alerta o normal.",
+   "objetivo": "Centralizar la regla RN-05 (stock 0 = AGOTADO; stock menor al mínimo = ALERTA) para que todas las consultas y procedimientos usen el mismo criterio.",
+   "explicacion": "Se unen Producto y Categoria con INNER JOIN y se agregan los lotes con LEFT JOIN para no perder los productos que aún no tienen lote. SUM(stock_actual) calcula el stock total y un CASE clasifica la situación del producto.",
+   "codigo": "CREATE OR ALTER VIEW dbo.vw_stock_producto\nAS\nSELECT  p.id_producto,\n        p.codigo_barras,\n        p.nombre                               AS producto,\n        c.nombre                               AS categoria,\n        c.tipo                                 AS tipo_categoria,\n        p.estado,\n        p.stock_minimo,\n        ISNULL(SUM(l.stock_actual), 0)         AS stock_total,\n        COUNT(l.id_lote)                       AS nro_lotes,\n        CASE WHEN ISNULL(SUM(l.stock_actual), 0) = 0              THEN 'AGOTADO'\n             WHEN ISNULL(SUM(l.stock_actual), 0) < p.stock_minimo THEN 'ALERTA'\n             ELSE 'NORMAL' END                 AS situacion_stock\nFROM    Producto  p\nJOIN    Categoria c ON c.id_categoria = p.id_categoria\nLEFT JOIN Lote    l ON l.id_producto   = p.id_producto\nGROUP BY p.id_producto, p.codigo_barras, p.nombre, c.nombre, c.tipo, p.estado, p.stock_minimo;",
+   "vista": "vw_stock_producto"
+  },
+  {
+   "id": "V02",
+   "titulo": "Productos por reponer",
+   "enunciado": "El administrador necesita la lista de productos ACTIVOS cuyo stock está agotado o por debajo del mínimo, con la cantidad que falta para llegar al mínimo, para decidir las compras a proveedores.",
+   "objetivo": "Apoyar la reposición de mercadería y evitar quiebres de stock.",
+   "explicacion": "Reutiliza la vista vw_stock_producto y filtra los productos activos cuya situación no es NORMAL. La columna faltante_para_minimo es la diferencia entre el stock mínimo y el stock actual.",
+   "codigo": "CREATE OR ALTER VIEW dbo.vw_reposicion_urgente\nAS\nSELECT  id_producto,\n        producto,\n        categoria,\n        stock_total,\n        stock_minimo,\n        stock_minimo - stock_total AS faltante_para_minimo,\n        situacion_stock\nFROM    dbo.vw_stock_producto\nWHERE   estado = 'ACTIVO'\n  AND   situacion_stock <> 'NORMAL';",
+   "vista": "vw_reposicion_urgente"
+  },
+  {
+   "id": "V03",
+   "titulo": "Lotes con stock y su estado de vencimiento",
+   "enunciado": "El encargado de almacén debe saber qué lotes con stock disponible ya vencieron o están por vencer para sacarlos de la venta o rematarlos y así reducir las pérdidas por productos vencidos.",
+   "objetivo": "Controlar los vencimientos y cuantificar el valor en riesgo de cada lote.",
+   "explicacion": "Se calcula dias_para_vencer con DATEDIFF contra la fecha actual y un CASE clasifica el lote en VENCIDO, CRITICO (hasta 15 días), PROXIMO (hasta 30 días) o VIGENTE. Solo se consideran lotes perecibles (fecha_vencimiento no nula) con stock mayor que cero. El valor en riesgo es stock por costo unitario.",
+   "codigo": "CREATE OR ALTER VIEW dbo.vw_lotes_vencimiento\nAS\nSELECT  l.id_lote,\n        l.numero_lote,\n        p.nombre                                                        AS producto,\n        l.fecha_vencimiento,\n        DATEDIFF(DAY, CAST(GETDATE() AS DATE), l.fecha_vencimiento)     AS dias_para_vencer,\n        l.stock_actual,\n        CAST(l.stock_actual * l.costo_unitario AS DECIMAL(12,2))        AS valor_en_riesgo,\n        CASE WHEN l.fecha_vencimiento <  CAST(GETDATE() AS DATE)                  THEN 'VENCIDO'\n             WHEN l.fecha_vencimiento <= DATEADD(DAY, 15, CAST(GETDATE() AS DATE)) THEN 'CRITICO'\n             WHEN l.fecha_vencimiento <= DATEADD(DAY, 30, CAST(GETDATE() AS DATE)) THEN 'PROXIMO'\n             ELSE 'VIGENTE' END                                         AS estado_vencimiento\nFROM    Lote l\nJOIN    Producto p ON p.id_producto = l.id_producto\nWHERE   l.stock_actual > 0\n  AND   l.fecha_vencimiento IS NOT NULL;",
+   "vista": "vw_lotes_vencimiento"
+  },
+  {
+   "id": "V04",
+   "titulo": "Valor del inventario por categoría",
+   "enunciado": "El administrador quiere saber cuánto dinero tiene invertido en mercadería (a costo) y cuánto podría recaudar (a precio de venta) en cada categoría.",
+   "objetivo": "Valorizar el inventario para decisiones de compra y para el control contable.",
+   "explicacion": "Se parte de Categoria y se usan dos LEFT JOIN (Producto y Lote) para que también aparezcan las categorías sin productos o sin stock. El valor a costo es SUM(stock_actual*costo_unitario) y el valor potencial es SUM(stock_actual*precio_venta).",
+   "codigo": "CREATE OR ALTER VIEW dbo.vw_valor_inventario_categoria\nAS\nSELECT  c.id_categoria,\n        c.nombre                                                     AS categoria,\n        c.tipo,\n        COUNT(DISTINCT p.id_producto)                                AS productos,\n        ISNULL(SUM(l.stock_actual), 0)                               AS unidades_en_stock,\n        CAST(ISNULL(SUM(l.stock_actual * l.costo_unitario), 0) AS DECIMAL(12,2)) AS valor_costo,\n        CAST(ISNULL(SUM(l.stock_actual * p.precio_venta), 0)   AS DECIMAL(12,2)) AS valor_venta_potencial\nFROM    Categoria c\nLEFT JOIN Producto p ON p.id_categoria = c.id_categoria\nLEFT JOIN Lote     l ON l.id_producto  = p.id_producto\nGROUP BY c.id_categoria, c.nombre, c.tipo;",
+   "vista": "vw_valor_inventario_categoria"
+  },
+  {
+   "id": "V05",
+   "titulo": "Detalle completo de ventas",
+   "enunciado": "Contabilidad y administración necesitan ver cada línea vendida con la fecha, el cajero, el cliente (si fue identificado), el producto, el lote de origen, la cantidad, el precio cobrado y el subtotal.",
+   "objetivo": "Dar trazabilidad total de la venta al lote de origen (objetivo específico de control y trazabilidad de T2).",
+   "explicacion": "Une Detalle_Venta con Venta, Empleado, Lote y Producto mediante INNER JOIN y con Cliente mediante LEFT JOIN, porque la venta puede no tener cliente (RN-07).",
+   "codigo": "CREATE OR ALTER VIEW dbo.vw_detalle_ventas\nAS\nSELECT  d.id_detalle,\n        v.id_venta,\n        v.fecha_venta,\n        e.usuario                       AS cajero,\n        ISNULL(c.nombres + N' ' + c.apellidos, N'SIN CLIENTE') AS cliente,\n        p.nombre                        AS producto,\n        l.numero_lote,\n        d.cantidad,\n        d.precio_unitario,\n        d.subtotal\nFROM    Detalle_Venta d\nJOIN    Venta    v ON v.id_venta    = d.id_venta\nJOIN    Empleado e ON e.id_empleado = v.id_empleado\nJOIN    Lote     l ON l.id_lote     = d.id_lote\nJOIN    Producto p ON p.id_producto = l.id_producto\nLEFT JOIN Cliente c ON c.id_cliente = v.id_cliente;",
+   "vista": "vw_detalle_ventas"
+  },
+  {
+   "id": "V06",
+   "titulo": "Cabecera de ventas con comprobante",
+   "enunciado": "El administrador quiere revisar cada venta con su cajero, su cliente, el medio de pago, el número de ítems, el total y el comprobante emitido (serie y número).",
+   "objetivo": "Tener una vista única del documento de venta para consultas en caja y auditoría.",
+   "explicacion": "Venta se une con Empleado (INNER JOIN) y con Cliente y Comprobante (LEFT JOIN, por si no hay cliente o aún no se emitió comprobante). Una subconsulta correlacionada cuenta las líneas de cada venta.",
+   "codigo": "CREATE OR ALTER VIEW dbo.vw_ventas_cabecera\nAS\nSELECT  v.id_venta,\n        v.fecha_venta,\n        e.nombres + N' ' + e.apellidos                          AS cajero,\n        ISNULL(c.nombres + N' ' + c.apellidos, N'SIN CLIENTE')  AS cliente,\n        v.tipo_pago,\n        (SELECT COUNT(*) FROM Detalle_Venta d WHERE d.id_venta = v.id_venta) AS items,\n        v.total,\n        CASE WHEN k.id_comprobante IS NULL THEN N'SIN COMPROBANTE'\n             ELSE k.tipo_comprobante + N' ' + k.serie + N'-' + RIGHT(N'00000000' + CAST(k.numero AS NVARCHAR(8)), 8) END AS comprobante\nFROM    Venta v\nJOIN    Empleado e ON e.id_empleado = v.id_empleado\nLEFT JOIN Cliente     c ON c.id_cliente = v.id_cliente\nLEFT JOIN Comprobante k ON k.id_venta   = v.id_venta;",
+   "vista": "vw_ventas_cabecera"
+  },
+  {
+   "id": "V07",
+   "titulo": "Ingresos por medio de pago",
+   "enunciado": "Gerencia necesita conocer cuántas ventas y cuánto dinero ingresa por cada medio de pago (efectivo, Yape, Plin y tarjeta) para el cuadre de caja y la conciliación con las billeteras digitales.",
+   "objetivo": "Conocer la preferencia de pago de los clientes y cuadrar la caja.",
+   "explicacion": "Agrupa Venta por tipo_pago y calcula el número de ventas, el monto total, el ticket promedio y el porcentaje que representa cada medio sobre el ingreso total mediante una subconsulta escalar.",
+   "codigo": "CREATE OR ALTER VIEW dbo.vw_ventas_medio_pago\nAS\nSELECT  v.tipo_pago,\n        COUNT(*)                                             AS nro_ventas,\n        SUM(v.total)                                         AS monto_total,\n        CAST(AVG(v.total) AS DECIMAL(10,2))                  AS ticket_promedio,\n        CAST(100.0 * SUM(v.total) / (SELECT SUM(total) FROM Venta) AS DECIMAL(5,2)) AS porcentaje_ingreso\nFROM    Venta v\nGROUP BY v.tipo_pago;",
+   "vista": "vw_ventas_medio_pago"
+  },
+  {
+   "id": "V08",
+   "titulo": "Ventas diarias",
+   "enunciado": "El dueño quiere ver, día por día, cuántas ventas se hicieron, cuánto se vendió, cuántas unidades salieron y cuál fue el ticket promedio.",
+   "objetivo": "Seguir la evolución diaria de las ventas para detectar los días de mayor movimiento.",
+   "explicacion": "Primero se resumen las unidades por venta en una tabla derivada (así el total de la venta no se duplica al unir con el detalle) y luego se agrupa por CAST(fecha_venta AS DATE) para obtener ventas, monto, unidades y ticket promedio.",
+   "codigo": "CREATE OR ALTER VIEW dbo.vw_ventas_diarias\nAS\nSELECT  CAST(v.fecha_venta AS DATE)          AS fecha,\n        COUNT(*)                             AS nro_ventas,\n        SUM(v.total)                         AS monto_total,\n        SUM(u.unidades)                      AS unidades_vendidas,\n        CAST(AVG(v.total) AS DECIMAL(10,2))  AS ticket_promedio\nFROM    Venta v\nJOIN   (SELECT id_venta, SUM(cantidad) AS unidades\n        FROM Detalle_Venta GROUP BY id_venta) u ON u.id_venta = v.id_venta\nGROUP BY CAST(v.fecha_venta AS DATE);",
+   "vista": "vw_ventas_diarias"
+  },
+  {
+   "id": "V09",
+   "titulo": "Ranking de productos más vendidos",
+   "enunciado": "El administrador quiere un ranking de los productos por unidades vendidas e ingresos, para decidir qué productos priorizar en las compras y en las promociones.",
+   "objetivo": "Identificar los productos de mayor rotación.",
+   "explicacion": "Se enlazan Detalle_Venta, Lote y Producto (INNER JOIN) y se agrupa por producto. La función de ventana RANK() OVER (ORDER BY unidades DESC) asigna la posición, respetando los empates.",
+   "codigo": "CREATE OR ALTER VIEW dbo.vw_ranking_productos\nAS\nSELECT  RANK() OVER (ORDER BY SUM(d.cantidad) DESC) AS posicion,\n        p.id_producto,\n        p.nombre                                    AS producto,\n        SUM(d.cantidad)                             AS unidades_vendidas,\n        SUM(d.subtotal)                             AS ingreso_total\nFROM    Detalle_Venta d\nJOIN    Lote     l ON l.id_lote     = d.id_lote\nJOIN    Producto p ON p.id_producto = l.id_producto\nGROUP BY p.id_producto, p.nombre;",
+   "vista": "vw_ranking_productos"
+  },
+  {
+   "id": "V10",
+   "titulo": "Rendimiento por empleado",
+   "enunciado": "El administrador quiere evaluar a todo el personal: cuántas ventas registró cada empleado, cuánto vendió y su ticket promedio, incluyendo a quienes todavía no registran ventas.",
+   "objetivo": "Medir la productividad del personal de caja y detectar personal sin actividad.",
+   "explicacion": "Empleado se une con Venta mediante LEFT JOIN para conservar a los empleados sin ventas; COUNT(v.id_venta) cuenta solo ventas reales y ISNULL evita valores nulos en los montos.",
+   "codigo": "CREATE OR ALTER VIEW dbo.vw_rendimiento_empleados\nAS\nSELECT  e.id_empleado,\n        e.nombres + N' ' + e.apellidos                    AS empleado,\n        e.rol,\n        e.activo,\n        COUNT(v.id_venta)                                 AS nro_ventas,\n        ISNULL(SUM(v.total), 0)                           AS monto_vendido,\n        ISNULL(CAST(AVG(v.total) AS DECIMAL(10,2)), 0)    AS ticket_promedio\nFROM    Empleado e\nLEFT JOIN Venta v ON v.id_empleado = e.id_empleado\nGROUP BY e.id_empleado, e.nombres, e.apellidos, e.rol, e.activo;",
+   "vista": "vw_rendimiento_empleados"
+  },
+  {
+   "id": "V11",
+   "titulo": "Clientes frecuentes",
+   "enunciado": "Para el programa de fidelización, el administrador necesita el historial resumido de cada cliente: número de compras, monto acumulado, ticket promedio y fecha de la última compra.",
+   "objetivo": "Identificar a los clientes más valiosos para orientar promociones (objetivo de fidelización de T2).",
+   "explicacion": "Cliente se une con Venta mediante LEFT JOIN para incluir a los clientes que aún no compran. MAX(fecha_venta) da la última compra y los agregados se calculan por cliente.",
+   "codigo": "CREATE OR ALTER VIEW dbo.vw_clientes_frecuentes\nAS\nSELECT  c.id_cliente,\n        c.dni,\n        c.nombres + N' ' + c.apellidos                   AS cliente,\n        c.distrito,\n        COUNT(v.id_venta)                                AS nro_compras,\n        ISNULL(SUM(v.total), 0)                          AS monto_total,\n        ISNULL(CAST(AVG(v.total) AS DECIMAL(10,2)), 0)   AS ticket_promedio,\n        MAX(v.fecha_venta)                               AS ultima_compra\nFROM    Cliente c\nLEFT JOIN Venta v ON v.id_cliente = c.id_cliente\nGROUP BY c.id_cliente, c.dni, c.nombres, c.apellidos, c.distrito;",
+   "vista": "vw_clientes_frecuentes"
+  },
+  {
+   "id": "V12",
+   "titulo": "Comprobantes emitidos",
+   "enunciado": "Contabilidad necesita el registro de boletas y facturas con su numeración, la fecha de emisión, el cliente, el RUC del receptor, el total y el tiempo transcurrido entre la venta y la emisión.",
+   "objetivo": "Controlar la emisión de comprobantes y detectar emisiones con retraso (regla RN-08).",
+   "explicacion": "Comprobante se une con Venta (INNER JOIN) y con Cliente (LEFT JOIN). El número se formatea con 8 dígitos y minutos_hasta_emision se calcula con DATEDIFF entre la venta y la emisión.",
+   "codigo": "CREATE OR ALTER VIEW dbo.vw_comprobantes_emitidos\nAS\nSELECT  k.id_comprobante,\n        k.tipo_comprobante,\n        k.serie + N'-' + RIGHT(N'00000000' + CAST(k.numero AS NVARCHAR(8)), 8) AS numero_completo,\n        k.serie,\n        k.numero,\n        k.fecha_emision,\n        v.id_venta,\n        ISNULL(c.nombres + N' ' + c.apellidos, N'SIN CLIENTE') AS cliente,\n        k.ruc_receptor,\n        v.total,\n        DATEDIFF(MINUTE, v.fecha_venta, k.fecha_emision)        AS minutos_hasta_emision\nFROM    Comprobante k\nJOIN    Venta v ON v.id_venta = k.id_venta\nLEFT JOIN Cliente c ON c.id_cliente = v.id_cliente;",
+   "vista": "vw_comprobantes_emitidos"
+  },
+  {
+   "id": "V13",
+   "titulo": "Margen bruto por producto",
+   "enunciado": "Gerencia quiere conocer cuánto gana el minimarket por cada producto vendido, comparando lo cobrado con el costo del lote del que salió la mercadería.",
+   "objetivo": "Medir la rentabilidad por producto para ajustar precios y compras.",
+   "explicacion": "Por cada línea se compara subtotal (precio cobrado, que se conserva según RN-09) con cantidad*costo_unitario del lote. Se agrupa por producto y se calcula el margen en soles y en porcentaje (NULLIF evita la división por cero).",
+   "codigo": "CREATE OR ALTER VIEW dbo.vw_margen_producto\nAS\nSELECT  p.id_producto,\n        p.nombre                                                   AS producto,\n        SUM(d.cantidad)                                            AS unidades_vendidas,\n        SUM(d.subtotal)                                            AS ingreso,\n        CAST(SUM(d.cantidad * l.costo_unitario) AS DECIMAL(12,2))  AS costo,\n        CAST(SUM(d.subtotal - d.cantidad * l.costo_unitario) AS DECIMAL(12,2)) AS margen,\n        CAST(100.0 * SUM(d.subtotal - d.cantidad * l.costo_unitario)\n             / NULLIF(SUM(d.subtotal), 0) AS DECIMAL(6,2))         AS margen_pct\nFROM    Detalle_Venta d\nJOIN    Lote     l ON l.id_lote     = d.id_lote\nJOIN    Producto p ON p.id_producto = l.id_producto\nGROUP BY p.id_producto, p.nombre;",
+   "vista": "vw_margen_producto"
+  },
+  {
+   "id": "V14",
+   "titulo": "Personal sin datos sensibles",
+   "enunciado": "Las áreas que consultan el directorio del personal (por ejemplo, el cajero que quiere saber quién es el supervisor) no deben ver las claves de acceso. Se necesita una vista de empleados que oculte clave_hash.",
+   "objetivo": "Cumplir el objetivo de seguridad y control de accesos: restringir la información sensible según el rol.",
+   "explicacion": "La vista expone solo datos no sensibles (nombre, usuario, correo, rol, estado y antigüedad en meses calculada con DATEDIFF) y omite clave_hash y el DNI. Se puede otorgar SELECT sobre la vista sin dar acceso a la tabla.",
+   "codigo": "CREATE OR ALTER VIEW dbo.vw_empleados_seguros\nAS\nSELECT  e.id_empleado,\n        e.nombres + N' ' + e.apellidos                      AS empleado,\n        e.usuario,\n        e.correo,\n        e.rol,\n        CASE e.activo WHEN 1 THEN 'ACTIVO' ELSE 'INACTIVO' END AS estado,\n        e.fecha_ingreso,\n        DATEDIFF(MONTH, e.fecha_ingreso, CAST(GETDATE() AS DATE)) AS antiguedad_meses\nFROM    Empleado e;",
+   "vista": "vw_empleados_seguros"
+  },
+  {
+   "id": "V15",
+   "titulo": "Control de integridad de ventas",
+   "enunciado": "El administrador necesita detectar automáticamente las ventas inconsistentes: total distinto de la suma de sus subtotales, ventas sin líneas de detalle o ventas sin comprobante.",
+   "objetivo": "Verificar las reglas RN-06, RN-08 y RN-09 (coherencia entre ventas, detalles y comprobantes) de forma permanente.",
+   "explicacion": "Por cada venta se calcula la suma de subtotales y se compara con el total. Con LEFT JOIN a Comprobante se detecta la ausencia de comprobante. La columna diagnostico resume el problema; una venta correcta muestra OK.",
+   "codigo": "CREATE OR ALTER VIEW dbo.vw_control_integridad_ventas\nAS\nSELECT  v.id_venta,\n        v.total,\n        ISNULL(s.suma_subtotales, 0)                  AS suma_subtotales,\n        v.total - ISNULL(s.suma_subtotales, 0)        AS diferencia,\n        ISNULL(s.lineas, 0)                           AS lineas,\n        CASE WHEN k.id_comprobante IS NULL THEN 0 ELSE 1 END AS tiene_comprobante,\n        CASE WHEN ISNULL(s.lineas, 0) = 0                    THEN 'SIN DETALLE'\n             WHEN v.total <> ISNULL(s.suma_subtotales, 0)    THEN 'TOTAL DESCUADRADO'\n             WHEN k.id_comprobante IS NULL                   THEN 'SIN COMPROBANTE'\n             ELSE 'OK' END                            AS diagnostico\nFROM    Venta v\nLEFT JOIN (SELECT id_venta, SUM(subtotal) AS suma_subtotales, COUNT(*) AS lineas\n           FROM Detalle_Venta GROUP BY id_venta) s ON s.id_venta = v.id_venta\nLEFT JOIN Comprobante k ON k.id_venta = v.id_venta;",
+   "vista": "vw_control_integridad_ventas"
+  }
+ ],
+ "consultas": [
+  {
+   "id": "S01",
+   "titulo": "Productos con precio superior al promedio",
+   "enunciado": "El administrador quiere identificar los productos cuyo precio de venta es mayor que el precio promedio del catálogo, para revisar su margen y su rotación.",
+   "objetivo": "Aplicar una subconsulta escalar en la cláusula WHERE.",
+   "explicacion": "La subconsulta (SELECT AVG(precio_venta) FROM Producto) devuelve un único valor, el promedio de precios, y la consulta externa solo conserva los productos que lo superan.",
+   "codigo": "SELECT  id_producto, nombre, precio_venta\nFROM    Producto\nWHERE   precio_venta > (SELECT AVG(precio_venta) FROM Producto)\nORDER BY precio_venta DESC;",
+   "sql": "SELECT  id_producto, nombre, precio_venta\nFROM    Producto\nWHERE   precio_venta > (SELECT AVG(precio_venta) FROM Producto)\nORDER BY precio_venta DESC"
+  },
+  {
+   "id": "S02",
+   "titulo": "Productos que nunca se han vendido",
+   "enunciado": "Para decidir descuentos o devoluciones al proveedor, el administrador necesita saber qué productos del catálogo no aparecen en ninguna venta.",
+   "objetivo": "Aplicar NOT EXISTS con una subconsulta correlacionada de varias tablas.",
+   "explicacion": "Para cada producto, la subconsulta busca si alguno de sus lotes figura en Detalle_Venta. Si no devuelve filas (NOT EXISTS), el producto nunca se vendió.",
+   "codigo": "SELECT  p.id_producto, p.nombre, p.estado\nFROM    Producto p\nWHERE   NOT EXISTS (SELECT 1\n                    FROM   Lote l\n                    JOIN   Detalle_Venta d ON d.id_lote = l.id_lote\n                    WHERE  l.id_producto = p.id_producto)\nORDER BY p.id_producto;",
+   "sql": "SELECT  p.id_producto, p.nombre, p.estado\nFROM    Producto p\nWHERE   NOT EXISTS (SELECT 1\n                    FROM   Lote l\n                    JOIN   Detalle_Venta d ON d.id_lote = l.id_lote\n                    WHERE  l.id_producto = p.id_producto)\nORDER BY p.id_producto"
+  },
+  {
+   "id": "S03",
+   "titulo": "Clientes registrados que aún no compran",
+   "enunciado": "El área comercial quiere contactar a los clientes que se registraron pero nunca han realizado una compra, para invitarlos con una promoción de bienvenida.",
+   "objetivo": "Aplicar NOT IN con una subconsulta no correlacionada.",
+   "explicacion": "La subconsulta lista los id_cliente que sí aparecen en Venta. Se excluyen los NULL (ventas sin cliente) porque un NULL dentro de NOT IN anularía todo el resultado.",
+   "codigo": "SELECT  c.id_cliente, c.nombres, c.apellidos, c.telefono, c.fecha_registro\nFROM    Cliente c\nWHERE   c.id_cliente NOT IN (SELECT v.id_cliente FROM Venta v WHERE v.id_cliente IS NOT NULL)\nORDER BY c.fecha_registro;",
+   "sql": "SELECT  c.id_cliente, c.nombres, c.apellidos, c.telefono, c.fecha_registro\nFROM    Cliente c\nWHERE   c.id_cliente NOT IN (SELECT v.id_cliente FROM Venta v WHERE v.id_cliente IS NOT NULL)\nORDER BY c.fecha_registro"
+  },
+  {
+   "id": "S04",
+   "titulo": "Empleados sin ventas registradas",
+   "enunciado": "Recursos humanos necesita saber qué empleados (activos o no) no han registrado ninguna venta, para evaluar su asignación o su permanencia.",
+   "objetivo": "Aplicar NOT EXISTS correlacionado sobre la tabla Venta.",
+   "explicacion": "Por cada empleado, la subconsulta verifica si existe alguna venta con su id_empleado; si no existe, el empleado se incluye en el resultado.",
+   "codigo": "SELECT  e.id_empleado, e.nombres, e.apellidos, e.rol, e.activo\nFROM    Empleado e\nWHERE   NOT EXISTS (SELECT 1 FROM Venta v WHERE v.id_empleado = e.id_empleado)\nORDER BY e.id_empleado;",
+   "sql": "SELECT  e.id_empleado, e.nombres, e.apellidos, e.rol, e.activo\nFROM    Empleado e\nWHERE   NOT EXISTS (SELECT 1 FROM Venta v WHERE v.id_empleado = e.id_empleado)\nORDER BY e.id_empleado"
+  },
+  {
+   "id": "S05",
+   "titulo": "Ventas con total superior al promedio",
+   "enunciado": "Gerencia quiere revisar las ventas de mayor valor, es decir, aquellas cuyo total supera al ticket promedio del minimarket.",
+   "objetivo": "Aplicar una subconsulta escalar para comparar cada fila con un agregado global.",
+   "explicacion": "(SELECT AVG(total) FROM Venta) calcula el ticket promedio una sola vez; la consulta externa devuelve las ventas que lo superan junto con el medio de pago.",
+   "codigo": "SELECT  v.id_venta, v.fecha_venta, v.tipo_pago, v.total\nFROM    Venta v\nWHERE   v.total > (SELECT AVG(total) FROM Venta)\nORDER BY v.total DESC;",
+   "sql": "SELECT  v.id_venta, v.fecha_venta, v.tipo_pago, v.total\nFROM    Venta v\nWHERE   v.total > (SELECT AVG(total) FROM Venta)\nORDER BY v.total DESC"
+  },
+  {
+   "id": "S06",
+   "titulo": "Clientes que gastan más que el cliente promedio",
+   "enunciado": "Para el programa de fidelización se requiere la lista de clientes cuyo gasto acumulado es superior al gasto promedio por cliente.",
+   "objetivo": "Aplicar una subconsulta en HAVING que a su vez usa una tabla derivada.",
+   "explicacion": "La tabla derivada calcula el gasto total de cada cliente; el AVG de esos gastos es el gasto promedio por cliente. HAVING compara el gasto de cada cliente con ese promedio.",
+   "codigo": "SELECT  c.id_cliente, c.nombres + N' ' + c.apellidos AS cliente, SUM(v.total) AS gasto_total\nFROM    Cliente c\nJOIN    Venta v ON v.id_cliente = c.id_cliente\nGROUP BY c.id_cliente, c.nombres, c.apellidos\nHAVING  SUM(v.total) > (SELECT AVG(g.gasto)\n                        FROM  (SELECT SUM(total) AS gasto\n                               FROM   Venta\n                               WHERE  id_cliente IS NOT NULL\n                               GROUP BY id_cliente) g)\nORDER BY gasto_total DESC;",
+   "sql": "SELECT  c.id_cliente, c.nombres + N' ' + c.apellidos AS cliente, SUM(v.total) AS gasto_total\nFROM    Cliente c\nJOIN    Venta v ON v.id_cliente = c.id_cliente\nGROUP BY c.id_cliente, c.nombres, c.apellidos\nHAVING  SUM(v.total) > (SELECT AVG(g.gasto)\n                        FROM  (SELECT SUM(total) AS gasto\n                               FROM   Venta\n                               WHERE  id_cliente IS NOT NULL\n                               GROUP BY id_cliente) g)\nORDER BY gasto_total DESC"
+  },
+  {
+   "id": "S07",
+   "titulo": "Producto más vendido por unidades",
+   "enunciado": "El administrador quiere saber cuál es el producto (o los productos, si hay empate) con mayor cantidad de unidades vendidas.",
+   "objetivo": "Comparar un agregado con el máximo de otros agregados mediante una subconsulta.",
+   "explicacion": "La subconsulta interna suma las unidades vendidas por producto y MAX obtiene la mayor suma. HAVING deja solo los productos cuyas unidades igualan ese máximo, de modo que los empates no se pierden.",
+   "codigo": "SELECT  p.id_producto, p.nombre, SUM(d.cantidad) AS unidades_vendidas\nFROM    Producto p\nJOIN    Lote l          ON l.id_producto = p.id_producto\nJOIN    Detalle_Venta d ON d.id_lote     = l.id_lote\nGROUP BY p.id_producto, p.nombre\nHAVING  SUM(d.cantidad) = (SELECT MAX(x.unidades)\n                           FROM  (SELECT SUM(d2.cantidad) AS unidades\n                                  FROM   Detalle_Venta d2\n                                  JOIN   Lote l2 ON l2.id_lote = d2.id_lote\n                                  GROUP BY l2.id_producto) x);",
+   "sql": "SELECT  p.id_producto, p.nombre, SUM(d.cantidad) AS unidades_vendidas\nFROM    Producto p\nJOIN    Lote l          ON l.id_producto = p.id_producto\nJOIN    Detalle_Venta d ON d.id_lote     = l.id_lote\nGROUP BY p.id_producto, p.nombre\nHAVING  SUM(d.cantidad) = (SELECT MAX(x.unidades)\n                           FROM  (SELECT SUM(d2.cantidad) AS unidades\n                                  FROM   Detalle_Venta d2\n                                  JOIN   Lote l2 ON l2.id_lote = d2.id_lote\n                                  GROUP BY l2.id_producto) x)"
+  },
+  {
+   "id": "S08",
+   "titulo": "Lotes con menos stock que el promedio de su producto",
+   "enunciado": "Cuando un producto tiene varios lotes, el almacenero debe saber cuáles tienen menos stock que el promedio de los lotes de ese mismo producto, para despacharlos primero (rotación).",
+   "objetivo": "Aplicar una subconsulta correlacionada que depende de cada fila de la consulta externa.",
+   "explicacion": "Para cada lote, la subconsulta calcula el stock promedio de los lotes del mismo producto (l2.id_producto = l.id_producto). Se comparan ambos valores; los productos de un solo lote nunca aparecen porque su promedio es igual a su stock.",
+   "codigo": "SELECT  l.id_lote, l.id_producto, l.numero_lote, l.stock_actual\nFROM    Lote l\nWHERE   l.stock_actual < (SELECT AVG(CAST(l2.stock_actual AS DECIMAL(10,2)))\n                          FROM   Lote l2\n                          WHERE  l2.id_producto = l.id_producto)\nORDER BY l.id_producto, l.id_lote;",
+   "sql": "SELECT  l.id_lote, l.id_producto, l.numero_lote, l.stock_actual\nFROM    Lote l\nWHERE   l.stock_actual < (SELECT AVG(CAST(l2.stock_actual AS DECIMAL(10,2)))\n                          FROM   Lote l2\n                          WHERE  l2.id_producto = l.id_producto)\nORDER BY l.id_producto, l.id_lote"
+  },
+  {
+   "id": "S09",
+   "titulo": "Productos con lotes vencidos o por vencer",
+   "enunciado": "El administrador quiere la lista de productos que tienen al menos un lote con stock que ya venció o vence dentro de los próximos 30 días, para retirarlos del anaquel o aplicar ofertas.",
+   "objetivo": "Aplicar IN con una subconsulta que filtra por fecha.",
+   "explicacion": "La subconsulta devuelve los id_producto de los lotes perecibles con stock cuya fecha de vencimiento es menor o igual a la fecha actual más 30 días. La consulta externa muestra los productos correspondientes.",
+   "codigo": "SELECT  p.id_producto, p.nombre, p.estado\nFROM    Producto p\nWHERE   p.id_producto IN (SELECT l.id_producto\n                          FROM   Lote l\n                          WHERE  l.stock_actual > 0\n                            AND  l.fecha_vencimiento IS NOT NULL\n                            AND  l.fecha_vencimiento <= DATEADD(DAY, 30, CAST(GETDATE() AS DATE)))\nORDER BY p.nombre;",
+   "sql": "SELECT  p.id_producto, p.nombre, p.estado\nFROM    Producto p\nWHERE   p.id_producto IN (SELECT l.id_producto\n                          FROM   Lote l\n                          WHERE  l.stock_actual > 0\n                            AND  l.fecha_vencimiento IS NOT NULL\n                            AND  l.fecha_vencimiento <= DATEADD(DAY, 30, CAST(GETDATE() AS DATE)))\nORDER BY p.nombre"
+  },
+  {
+   "id": "S10",
+   "titulo": "Categorías con al menos un producto agotado",
+   "enunciado": "El comprador quiere saber en qué categorías hay productos agotados (stock total cero) para priorizar los pedidos.",
+   "objetivo": "Aplicar EXISTS con una subconsulta anidada de dos niveles.",
+   "explicacion": "EXISTS evalúa, por categoría, si hay un producto cuyo stock total es cero. El stock total del producto se obtiene con otra subconsulta escalar sobre Lote; ISNULL cuenta como cero a los productos sin lotes.",
+   "codigo": "SELECT  c.id_categoria, c.nombre, c.tipo\nFROM    Categoria c\nWHERE   EXISTS (SELECT 1\n                FROM   Producto p\n                WHERE  p.id_categoria = c.id_categoria\n                  AND  ISNULL((SELECT SUM(l.stock_actual)\n                               FROM   Lote l\n                               WHERE  l.id_producto = p.id_producto), 0) = 0)\nORDER BY c.id_categoria;",
+   "sql": "SELECT  c.id_categoria, c.nombre, c.tipo\nFROM    Categoria c\nWHERE   EXISTS (SELECT 1\n                FROM   Producto p\n                WHERE  p.id_categoria = c.id_categoria\n                  AND  ISNULL((SELECT SUM(l.stock_actual)\n                               FROM   Lote l\n                               WHERE  l.id_producto = p.id_producto), 0) = 0)\nORDER BY c.id_categoria"
+  },
+  {
+   "id": "S11",
+   "titulo": "Fecha de la última compra de cada cliente",
+   "enunciado": "El área comercial necesita ver, para cada cliente, la fecha de su última compra, para contactar a quienes llevan tiempo sin comprar.",
+   "objetivo": "Aplicar una subconsulta correlacionada en la lista SELECT.",
+   "explicacion": "Por cada cliente, la subconsulta devuelve MAX(fecha_venta) de sus ventas; si no compró, devuelve NULL, que se presenta como «Sin compras».",
+   "codigo": "SELECT  c.id_cliente,\n        c.nombres + N' ' + c.apellidos AS cliente,\n        (SELECT MAX(v.fecha_venta) FROM Venta v WHERE v.id_cliente = c.id_cliente) AS ultima_compra,\n        ISNULL(CONVERT(NVARCHAR(20), (SELECT MAX(v.fecha_venta) FROM Venta v WHERE v.id_cliente = c.id_cliente), 120), N'Sin compras') AS ultima_compra_texto\nFROM    Cliente c\nORDER BY ultima_compra DESC, c.id_cliente;",
+   "sql": "SELECT  c.id_cliente,\n        c.nombres + N' ' + c.apellidos AS cliente,\n        (SELECT MAX(v.fecha_venta) FROM Venta v WHERE v.id_cliente = c.id_cliente) AS ultima_compra,\n        ISNULL(CONVERT(NVARCHAR(20), (SELECT MAX(v.fecha_venta) FROM Venta v WHERE v.id_cliente = c.id_cliente), 120), N'Sin compras') AS ultima_compra_texto\nFROM    Cliente c\nORDER BY ultima_compra DESC, c.id_cliente"
+  },
+  {
+   "id": "S12",
+   "titulo": "Producto más caro de cada categoría",
+   "enunciado": "Gerencia desea conocer el producto de mayor precio en cada categoría para evaluar la política de precios.",
+   "objetivo": "Aplicar una subconsulta correlacionada con MAX por grupo.",
+   "explicacion": "La subconsulta calcula el precio máximo de los productos de la misma categoría; la consulta externa conserva los productos cuyo precio coincide con ese máximo.",
+   "codigo": "SELECT  c.nombre AS categoria, p.nombre AS producto, p.precio_venta\nFROM    Producto p\nJOIN    Categoria c ON c.id_categoria = p.id_categoria\nWHERE   p.precio_venta = (SELECT MAX(p2.precio_venta)\n                          FROM   Producto p2\n                          WHERE  p2.id_categoria = p.id_categoria)\nORDER BY p.precio_venta DESC;",
+   "sql": "SELECT  c.nombre AS categoria, p.nombre AS producto, p.precio_venta\nFROM    Producto p\nJOIN    Categoria c ON c.id_categoria = p.id_categoria\nWHERE   p.precio_venta = (SELECT MAX(p2.precio_venta)\n                          FROM   Producto p2\n                          WHERE  p2.id_categoria = p.id_categoria)\nORDER BY p.precio_venta DESC"
+  },
+  {
+   "id": "S13",
+   "titulo": "Ventas posiblemente duplicadas",
+   "enunciado": "Se sospecha que algunas ventas se registraron dos veces por error (mismo cajero, mismo cliente, mismo total y con minutos de diferencia). Contabilidad necesita identificarlas para revisarlas.",
+   "objetivo": "Detectar anomalías operativas con EXISTS correlacionado sobre la misma tabla.",
+   "explicacion": "Cada venta se compara con las demás ventas (alias o). Si existe otra con el mismo empleado, el mismo cliente, el mismo total y a no más de 5 minutos de diferencia, ambas se reportan. ISNULL permite comparar clientes nulos.",
+   "codigo": "SELECT  v.id_venta, v.fecha_venta, v.id_empleado, v.id_cliente, v.tipo_pago, v.total\nFROM    Venta v\nWHERE   EXISTS (SELECT 1\n                FROM   Venta o\n                WHERE  o.id_venta <> v.id_venta\n                  AND  o.id_empleado = v.id_empleado\n                  AND  ISNULL(o.id_cliente, 0) = ISNULL(v.id_cliente, 0)\n                  AND  o.total = v.total\n                  AND  ABS(DATEDIFF(MINUTE, o.fecha_venta, v.fecha_venta)) <= 5)\nORDER BY v.fecha_venta;",
+   "sql": "SELECT  v.id_venta, v.fecha_venta, v.id_empleado, v.id_cliente, v.tipo_pago, v.total\nFROM    Venta v\nWHERE   EXISTS (SELECT 1\n                FROM   Venta o\n                WHERE  o.id_venta <> v.id_venta\n                  AND  o.id_empleado = v.id_empleado\n                  AND  ISNULL(o.id_cliente, 0) = ISNULL(v.id_cliente, 0)\n                  AND  o.total = v.total\n                  AND  ABS(DATEDIFF(MINUTE, o.fecha_venta, v.fecha_venta)) <= 5)\nORDER BY v.fecha_venta"
+  },
+  {
+   "id": "S14",
+   "titulo": "Ventas pagadas con el medio de pago más utilizado",
+   "enunciado": "Para negociar comisiones con las billeteras y el POS, gerencia quiere listar las ventas realizadas con el medio de pago que más se usa.",
+   "objetivo": "Usar una subconsulta con TOP 1 y ORDER BY para obtener un valor de decisión.",
+   "explicacion": "La subconsulta agrupa las ventas por tipo_pago y devuelve el medio con más ventas (en caso de empate, el primero alfabéticamente). La consulta externa lista las ventas que usaron ese medio.",
+   "codigo": "SELECT  v.id_venta, v.fecha_venta, v.tipo_pago, v.total\nFROM    Venta v\nWHERE   v.tipo_pago = (SELECT TOP 1 tipo_pago\n                       FROM   Venta\n                       GROUP BY tipo_pago\n                       ORDER BY COUNT(*) DESC, tipo_pago)\nORDER BY v.fecha_venta;",
+   "sql": "SELECT  v.id_venta, v.fecha_venta, v.tipo_pago, v.total\nFROM    Venta v\nWHERE   v.tipo_pago = (SELECT TOP 1 tipo_pago\n                       FROM   Venta\n                       GROUP BY tipo_pago\n                       ORDER BY COUNT(*) DESC, tipo_pago)\nORDER BY v.fecha_venta"
+  },
+  {
+   "id": "S15",
+   "titulo": "Participación de cada categoría en los ingresos",
+   "enunciado": "El dueño quiere saber qué porcentaje de los ingresos totales por ventas aporta cada categoría, para enfocar el surtido.",
+   "objetivo": "Combinar una subconsulta escalar (total general) con una agregación por categoría.",
+   "explicacion": "El ingreso de cada categoría se calcula uniendo Categoria, Producto, Lote y Detalle_Venta. La subconsulta (SELECT SUM(subtotal) FROM Detalle_Venta) entrega el total general sobre el que se calcula el porcentaje.",
+   "codigo": "SELECT  c.nombre AS categoria,\n        SUM(d.subtotal) AS ingreso,\n        CAST(100.0 * SUM(d.subtotal) / (SELECT SUM(subtotal) FROM Detalle_Venta) AS DECIMAL(5,2)) AS porcentaje\nFROM    Categoria c\nJOIN    Producto p      ON p.id_categoria = c.id_categoria\nJOIN    Lote l          ON l.id_producto  = p.id_producto\nJOIN    Detalle_Venta d ON d.id_lote      = l.id_lote\nGROUP BY c.id_categoria, c.nombre\nORDER BY ingreso DESC;",
+   "sql": "SELECT  c.nombre AS categoria,\n        SUM(d.subtotal) AS ingreso,\n        CAST(100.0 * SUM(d.subtotal) / (SELECT SUM(subtotal) FROM Detalle_Venta) AS DECIMAL(5,2)) AS porcentaje\nFROM    Categoria c\nJOIN    Producto p      ON p.id_categoria = c.id_categoria\nJOIN    Lote l          ON l.id_producto  = p.id_producto\nJOIN    Detalle_Venta d ON d.id_lote      = l.id_lote\nGROUP BY c.id_categoria, c.nombre\nORDER BY ingreso DESC"
+  },
+  {
+   "id": "M01",
+   "titulo": "Catálogo de productos con su categoría (INNER JOIN)",
+   "enunciado": "El cajero necesita el catálogo de productos con el nombre y tipo de su categoría y su precio de venta.",
+   "objetivo": "Relacionar Producto con Categoria mediante INNER JOIN (relación 1:N).",
+   "explicacion": "Cada producto tiene una única categoría (FK obligatoria), por lo que INNER JOIN devuelve todos los productos con los datos de su categoría.",
+   "codigo": "SELECT  p.id_producto, p.codigo_barras, p.nombre AS producto, c.nombre AS categoria, c.tipo, p.precio_venta, p.estado\nFROM    Producto p\nINNER JOIN Categoria c ON c.id_categoria = p.id_categoria\nORDER BY c.tipo, c.nombre, p.nombre;",
+   "sql": "SELECT  p.id_producto, p.codigo_barras, p.nombre AS producto, c.nombre AS categoria, c.tipo, p.precio_venta, p.estado\nFROM    Producto p\nINNER JOIN Categoria c ON c.id_categoria = p.id_categoria\nORDER BY c.tipo, c.nombre, p.nombre"
+  },
+  {
+   "id": "M02",
+   "titulo": "Lotes con producto, categoría y costo (INNER JOIN de 3 tablas)",
+   "enunciado": "El almacenero quiere ver los lotes recibidos, de qué producto y categoría son, cuándo ingresaron, cuándo vencen y cuánto cuesta cada unidad.",
+   "objetivo": "Encadenar tres tablas (Lote, Producto, Categoria) con INNER JOIN.",
+   "explicacion": "Lote se une con Producto por id_producto y Producto con Categoria por id_categoria. Solo aparecen lotes con producto y categoría válidos, lo que garantiza la integridad referencial.",
+   "codigo": "SELECT  l.id_lote, l.numero_lote, p.nombre AS producto, c.nombre AS categoria,\n        l.fecha_ingreso, l.fecha_vencimiento, l.cantidad_inicial, l.stock_actual, l.costo_unitario\nFROM    Lote l\nINNER JOIN Producto  p ON p.id_producto  = l.id_producto\nINNER JOIN Categoria c ON c.id_categoria = p.id_categoria\nORDER BY l.fecha_ingreso, l.id_lote;",
+   "sql": "SELECT  l.id_lote, l.numero_lote, p.nombre AS producto, c.nombre AS categoria,\n        l.fecha_ingreso, l.fecha_vencimiento, l.cantidad_inicial, l.stock_actual, l.costo_unitario\nFROM    Lote l\nINNER JOIN Producto  p ON p.id_producto  = l.id_producto\nINNER JOIN Categoria c ON c.id_categoria = p.id_categoria\nORDER BY l.fecha_ingreso, l.id_lote"
+  },
+  {
+   "id": "M03",
+   "titulo": "Detalle de cada venta con cajero, producto y lote (INNER JOIN de 5 tablas)",
+   "enunciado": "Contabilidad necesita ver cada línea vendida con la fecha, el cajero, el producto, el lote del que salió y el subtotal.",
+   "objetivo": "Reconstruir el documento de venta uniendo Venta, Detalle_Venta, Empleado, Lote y Producto.",
+   "explicacion": "Detalle_Venta es la tabla asociativa entre Venta y Lote. Las uniones INNER JOIN recorren la cadena venta → línea → lote → producto y venta → empleado para obtener la trazabilidad completa.",
+   "codigo": "SELECT  v.id_venta, v.fecha_venta, e.usuario AS cajero, p.nombre AS producto,\n        l.numero_lote, d.cantidad, d.precio_unitario, d.subtotal\nFROM    Venta v\nINNER JOIN Detalle_Venta d ON d.id_venta    = v.id_venta\nINNER JOIN Empleado      e ON e.id_empleado = v.id_empleado\nINNER JOIN Lote          l ON l.id_lote     = d.id_lote\nINNER JOIN Producto      p ON p.id_producto = l.id_producto\nORDER BY v.id_venta, d.id_detalle;",
+   "sql": "SELECT  v.id_venta, v.fecha_venta, e.usuario AS cajero, p.nombre AS producto,\n        l.numero_lote, d.cantidad, d.precio_unitario, d.subtotal\nFROM    Venta v\nINNER JOIN Detalle_Venta d ON d.id_venta    = v.id_venta\nINNER JOIN Empleado      e ON e.id_empleado = v.id_empleado\nINNER JOIN Lote          l ON l.id_lote     = d.id_lote\nINNER JOIN Producto      p ON p.id_producto = l.id_producto\nORDER BY v.id_venta, d.id_detalle"
+  },
+  {
+   "id": "M04",
+   "titulo": "Ventas a clientes identificados (INNER JOIN)",
+   "enunciado": "El área comercial quiere listar solo las ventas hechas a clientes identificados, con su DNI, su distrito, el cajero y el total.",
+   "objetivo": "Usar INNER JOIN para excluir deliberadamente las ventas sin cliente (RN-07).",
+   "explicacion": "Como Venta.id_cliente puede ser NULL, INNER JOIN con Cliente descarta esas ventas y deja solo las que tienen un cliente asociado.",
+   "codigo": "SELECT  v.id_venta, v.fecha_venta, c.dni, c.nombres + N' ' + c.apellidos AS cliente, c.distrito,\n        e.usuario AS cajero, v.tipo_pago, v.total\nFROM    Venta v\nINNER JOIN Cliente  c ON c.id_cliente  = v.id_cliente\nINNER JOIN Empleado e ON e.id_empleado = v.id_empleado\nORDER BY v.fecha_venta;",
+   "sql": "SELECT  v.id_venta, v.fecha_venta, c.dni, c.nombres + N' ' + c.apellidos AS cliente, c.distrito,\n        e.usuario AS cajero, v.tipo_pago, v.total\nFROM    Venta v\nINNER JOIN Cliente  c ON c.id_cliente  = v.id_cliente\nINNER JOIN Empleado e ON e.id_empleado = v.id_empleado\nORDER BY v.fecha_venta"
+  },
+  {
+   "id": "M05",
+   "titulo": "Comprobantes con venta y cajero (INNER JOIN)",
+   "enunciado": "Contabilidad necesita el libro de comprobantes con la serie, el número, la fecha de emisión, el cajero que atendió y el total de la venta.",
+   "objetivo": "Relacionar Comprobante, Venta y Empleado (relación 1:1 entre Venta y Comprobante).",
+   "explicacion": "Cada comprobante pertenece a una sola venta (UQ_Comprobante_Venta). Con INNER JOIN se obtienen los datos de la venta y del empleado responsable de cada comprobante.",
+   "codigo": "SELECT  k.tipo_comprobante, k.serie, k.numero, k.fecha_emision, v.id_venta,\n        e.nombres + N' ' + e.apellidos AS cajero, v.total\nFROM    Comprobante k\nINNER JOIN Venta    v ON v.id_venta    = k.id_venta\nINNER JOIN Empleado e ON e.id_empleado = v.id_empleado\nORDER BY k.serie, k.numero;",
+   "sql": "SELECT  k.tipo_comprobante, k.serie, k.numero, k.fecha_emision, v.id_venta,\n        e.nombres + N' ' + e.apellidos AS cajero, v.total\nFROM    Comprobante k\nINNER JOIN Venta    v ON v.id_venta    = k.id_venta\nINNER JOIN Empleado e ON e.id_empleado = v.id_empleado\nORDER BY k.serie, k.numero"
+  },
+  {
+   "id": "M06",
+   "titulo": "Trazabilidad: lotes vendidos a cada cliente (INNER JOIN de 6 tablas)",
+   "enunciado": "Ante un reclamo o una alerta sanitaria, el administrador debe saber a qué clientes se vendió mercadería de un lote determinado y con qué comprobante.",
+   "objetivo": "Demostrar la trazabilidad del lote hasta el cliente y el comprobante.",
+   "explicacion": "Se unen Lote, Producto, Detalle_Venta, Venta, Cliente y Comprobante. Solo aparecen ventas con cliente identificado y comprobante emitido, que son las que permiten contactar al comprador.",
+   "codigo": "SELECT  l.numero_lote, p.nombre AS producto, v.fecha_venta,\n        c.nombres + N' ' + c.apellidos AS cliente, c.telefono,\n        k.serie + N'-' + CAST(k.numero AS NVARCHAR(10)) AS comprobante, d.cantidad\nFROM    Lote l\nINNER JOIN Producto      p ON p.id_producto = l.id_producto\nINNER JOIN Detalle_Venta d ON d.id_lote     = l.id_lote\nINNER JOIN Venta         v ON v.id_venta    = d.id_venta\nINNER JOIN Cliente       c ON c.id_cliente  = v.id_cliente\nINNER JOIN Comprobante   k ON k.id_venta    = v.id_venta\nORDER BY l.numero_lote, v.fecha_venta;",
+   "sql": "SELECT  l.numero_lote, p.nombre AS producto, v.fecha_venta,\n        c.nombres + N' ' + c.apellidos AS cliente, c.telefono,\n        k.serie + N'-' + CAST(k.numero AS NVARCHAR(10)) AS comprobante, d.cantidad\nFROM    Lote l\nINNER JOIN Producto      p ON p.id_producto = l.id_producto\nINNER JOIN Detalle_Venta d ON d.id_lote     = l.id_lote\nINNER JOIN Venta         v ON v.id_venta    = d.id_venta\nINNER JOIN Cliente       c ON c.id_cliente  = v.id_cliente\nINNER JOIN Comprobante   k ON k.id_venta    = v.id_venta\nORDER BY l.numero_lote, v.fecha_venta"
+  },
+  {
+   "id": "M07",
+   "titulo": "Ingresos por tipo de categoría (INNER JOIN con GROUP BY)",
+   "enunciado": "Gerencia quiere saber cuánto ingresa por cada tipo de mercadería (ALIMENTO, BEBIDA, LIMPIEZA, GENERAL) y cuántas unidades se venden.",
+   "objetivo": "Agregar datos de cinco tablas encadenadas con INNER JOIN.",
+   "explicacion": "Se recorre Categoria → Producto → Lote → Detalle_Venta → Venta (para contar ventas distintas). SUM(subtotal) da el ingreso y COUNT(DISTINCT id_venta) evita contar dos veces una venta con varias líneas del mismo tipo.",
+   "codigo": "SELECT  c.tipo,\n        COUNT(DISTINCT v.id_venta) AS ventas,\n        SUM(d.cantidad)            AS unidades,\n        SUM(d.subtotal)            AS ingreso\nFROM    Categoria c\nINNER JOIN Producto      p ON p.id_categoria = c.id_categoria\nINNER JOIN Lote          l ON l.id_producto  = p.id_producto\nINNER JOIN Detalle_Venta d ON d.id_lote      = l.id_lote\nINNER JOIN Venta         v ON v.id_venta     = d.id_venta\nGROUP BY c.tipo\nORDER BY ingreso DESC;",
+   "sql": "SELECT  c.tipo,\n        COUNT(DISTINCT v.id_venta) AS ventas,\n        SUM(d.cantidad)            AS unidades,\n        SUM(d.subtotal)            AS ingreso\nFROM    Categoria c\nINNER JOIN Producto      p ON p.id_categoria = c.id_categoria\nINNER JOIN Lote          l ON l.id_producto  = p.id_producto\nINNER JOIN Detalle_Venta d ON d.id_lote      = l.id_lote\nINNER JOIN Venta         v ON v.id_venta     = d.id_venta\nGROUP BY c.tipo\nORDER BY ingreso DESC"
+  },
+  {
+   "id": "M08",
+   "titulo": "Facturas con cliente y RUC del receptor (INNER JOIN)",
+   "enunciado": "Contabilidad necesita las facturas emitidas con el RUC del receptor, el cliente asociado a la venta y el monto, para el registro de ventas.",
+   "objetivo": "Combinar Comprobante, Venta y Cliente filtrando solo las facturas (RN-08).",
+   "explicacion": "El filtro tipo_comprobante = 'FACTURA' limita a los comprobantes que exigen RUC. INNER JOIN con Cliente muestra el cliente de cada factura.",
+   "codigo": "SELECT  k.serie, k.numero, k.fecha_emision, k.ruc_receptor,\n        c.nombres + N' ' + c.apellidos AS cliente, v.total\nFROM    Comprobante k\nINNER JOIN Venta   v ON v.id_venta   = k.id_venta\nINNER JOIN Cliente c ON c.id_cliente = v.id_cliente\nWHERE   k.tipo_comprobante = 'FACTURA'\nORDER BY k.numero;",
+   "sql": "SELECT  k.serie, k.numero, k.fecha_emision, k.ruc_receptor,\n        c.nombres + N' ' + c.apellidos AS cliente, v.total\nFROM    Comprobante k\nINNER JOIN Venta   v ON v.id_venta   = k.id_venta\nINNER JOIN Cliente c ON c.id_cliente = v.id_cliente\nWHERE   k.tipo_comprobante = 'FACTURA'\nORDER BY k.numero"
+  },
+  {
+   "id": "M09",
+   "titulo": "Ventas por cajero y medio de pago (INNER JOIN con GROUP BY)",
+   "enunciado": "El administrador quiere saber cuánto vendió cada cajero con cada medio de pago, para el cuadre de caja por empleado.",
+   "objetivo": "Cruzar Empleado, Venta y Comprobante agrupando por cajero y medio de pago.",
+   "explicacion": "Se usan INNER JOIN para considerar únicamente ventas con comprobante emitido, y se agrupa por empleado y tipo_pago con COUNT y SUM.",
+   "codigo": "SELECT  e.usuario AS cajero, e.rol, v.tipo_pago, COUNT(*) AS ventas, SUM(v.total) AS monto\nFROM    Empleado e\nINNER JOIN Venta       v ON v.id_empleado = e.id_empleado\nINNER JOIN Comprobante k ON k.id_venta    = v.id_venta\nGROUP BY e.usuario, e.rol, v.tipo_pago\nORDER BY e.usuario, v.tipo_pago;",
+   "sql": "SELECT  e.usuario AS cajero, e.rol, v.tipo_pago, COUNT(*) AS ventas, SUM(v.total) AS monto\nFROM    Empleado e\nINNER JOIN Venta       v ON v.id_empleado = e.id_empleado\nINNER JOIN Comprobante k ON k.id_venta    = v.id_venta\nGROUP BY e.usuario, e.rol, v.tipo_pago\nORDER BY e.usuario, v.tipo_pago"
+  },
+  {
+   "id": "M10",
+   "titulo": "Todos los productos con sus unidades vendidas (LEFT JOIN)",
+   "enunciado": "El administrador quiere un reporte de todos los productos del catálogo con las unidades vendidas, mostrando también los que no se han vendido (con cero).",
+   "objetivo": "Conservar todas las filas de la tabla izquierda (Producto) aunque no tengan coincidencias.",
+   "explicacion": "Producto se une con Lote y Detalle_Venta mediante LEFT JOIN. Los productos sin lote o sin ventas quedan con NULL, que ISNULL convierte en 0.",
+   "codigo": "SELECT  p.id_producto, p.nombre AS producto, p.estado,\n        ISNULL(SUM(d.cantidad), 0) AS unidades_vendidas,\n        ISNULL(SUM(d.subtotal), 0) AS ingreso\nFROM    Producto p\nLEFT JOIN Lote          l ON l.id_producto = p.id_producto\nLEFT JOIN Detalle_Venta d ON d.id_lote     = l.id_lote\nGROUP BY p.id_producto, p.nombre, p.estado\nORDER BY unidades_vendidas DESC, p.nombre;",
+   "sql": "SELECT  p.id_producto, p.nombre AS producto, p.estado,\n        ISNULL(SUM(d.cantidad), 0) AS unidades_vendidas,\n        ISNULL(SUM(d.subtotal), 0) AS ingreso\nFROM    Producto p\nLEFT JOIN Lote          l ON l.id_producto = p.id_producto\nLEFT JOIN Detalle_Venta d ON d.id_lote     = l.id_lote\nGROUP BY p.id_producto, p.nombre, p.estado\nORDER BY unidades_vendidas DESC, p.nombre"
+  },
+  {
+   "id": "M11",
+   "titulo": "Todos los clientes con su gasto acumulado (LEFT JOIN)",
+   "enunciado": "El área comercial necesita la lista completa de clientes con el número de compras y el monto gastado, incluyendo a los que todavía no compran.",
+   "objetivo": "Usar LEFT JOIN para no perder clientes sin ventas.",
+   "explicacion": "Cliente es la tabla izquierda. Los clientes sin ventas tienen NULL en las columnas de Venta; COUNT(v.id_venta) cuenta 0 para ellos y ISNULL deja el monto en 0.",
+   "codigo": "SELECT  c.id_cliente, c.nombres + N' ' + c.apellidos AS cliente, c.distrito,\n        COUNT(v.id_venta)       AS compras,\n        ISNULL(SUM(v.total), 0) AS monto_gastado\nFROM    Cliente c\nLEFT JOIN Venta v ON v.id_cliente = c.id_cliente\nGROUP BY c.id_cliente, c.nombres, c.apellidos, c.distrito\nORDER BY monto_gastado DESC, c.id_cliente;",
+   "sql": "SELECT  c.id_cliente, c.nombres + N' ' + c.apellidos AS cliente, c.distrito,\n        COUNT(v.id_venta)       AS compras,\n        ISNULL(SUM(v.total), 0) AS monto_gastado\nFROM    Cliente c\nLEFT JOIN Venta v ON v.id_cliente = c.id_cliente\nGROUP BY c.id_cliente, c.nombres, c.apellidos, c.distrito\nORDER BY monto_gastado DESC, c.id_cliente"
+  },
+  {
+   "id": "M12",
+   "titulo": "Todos los empleados con sus ventas (LEFT JOIN)",
+   "enunciado": "Recursos humanos quiere ver a todo el personal con el número de ventas y el monto vendido, incluso a quienes no registran ventas.",
+   "objetivo": "Medir la actividad de todos los empleados sin excluir a los inactivos o nuevos.",
+   "explicacion": "Empleado se une con Venta mediante LEFT JOIN. Los empleados sin ventas aparecen con 0 ventas y monto 0.",
+   "codigo": "SELECT  e.id_empleado, e.usuario, e.rol, e.activo,\n        COUNT(v.id_venta)       AS ventas,\n        ISNULL(SUM(v.total), 0) AS monto_vendido\nFROM    Empleado e\nLEFT JOIN Venta v ON v.id_empleado = e.id_empleado\nGROUP BY e.id_empleado, e.usuario, e.rol, e.activo\nORDER BY monto_vendido DESC, e.id_empleado;",
+   "sql": "SELECT  e.id_empleado, e.usuario, e.rol, e.activo,\n        COUNT(v.id_venta)       AS ventas,\n        ISNULL(SUM(v.total), 0) AS monto_vendido\nFROM    Empleado e\nLEFT JOIN Venta v ON v.id_empleado = e.id_empleado\nGROUP BY e.id_empleado, e.usuario, e.rol, e.activo\nORDER BY monto_vendido DESC, e.id_empleado"
+  },
+  {
+   "id": "M13",
+   "titulo": "Categorías con su número de productos y su stock (LEFT JOIN)",
+   "enunciado": "El comprador quiere revisar todas las categorías con la cantidad de productos que tienen y su stock total, para ver qué categorías están vacías o sin stock.",
+   "objetivo": "Detectar categorías sin productos o sin existencias mediante LEFT JOIN.",
+   "explicacion": "Categoria se une con Producto y Lote por LEFT JOIN. COUNT(DISTINCT p.id_producto) cuenta productos y SUM(l.stock_actual) suma existencias; los NULL se muestran como 0.",
+   "codigo": "SELECT  c.id_categoria, c.nombre AS categoria, c.tipo,\n        COUNT(DISTINCT p.id_producto) AS productos,\n        ISNULL(SUM(l.stock_actual), 0) AS stock_total\nFROM    Categoria c\nLEFT JOIN Producto p ON p.id_categoria = c.id_categoria\nLEFT JOIN Lote     l ON l.id_producto  = p.id_producto\nGROUP BY c.id_categoria, c.nombre, c.tipo\nORDER BY stock_total, c.id_categoria;",
+   "sql": "SELECT  c.id_categoria, c.nombre AS categoria, c.tipo,\n        COUNT(DISTINCT p.id_producto) AS productos,\n        ISNULL(SUM(l.stock_actual), 0) AS stock_total\nFROM    Categoria c\nLEFT JOIN Producto p ON p.id_categoria = c.id_categoria\nLEFT JOIN Lote     l ON l.id_producto  = p.id_producto\nGROUP BY c.id_categoria, c.nombre, c.tipo\nORDER BY stock_total, c.id_categoria"
+  },
+  {
+   "id": "M14",
+   "titulo": "Lotes con sus ventas, incluidos los que no rotan (LEFT JOIN)",
+   "enunciado": "El almacenero quiere saber, por cada lote, cuántas unidades se vendieron y cuántas ventas lo incluyen, identificando lotes sin ninguna venta.",
+   "objetivo": "Detectar lotes sin rotación (mercadería inmovilizada).",
+   "explicacion": "Lote es la tabla izquierda y Detalle_Venta la derecha. Los lotes sin ventas muestran 0 unidades; WHERE no se usa para no eliminarlos.",
+   "codigo": "SELECT  l.id_lote, l.numero_lote, p.nombre AS producto, l.cantidad_inicial, l.stock_actual,\n        COUNT(d.id_detalle)       AS lineas_de_venta,\n        ISNULL(SUM(d.cantidad), 0) AS unidades_vendidas\nFROM    Lote l\nINNER JOIN Producto p ON p.id_producto = l.id_producto\nLEFT JOIN  Detalle_Venta d ON d.id_lote = l.id_lote\nGROUP BY l.id_lote, l.numero_lote, p.nombre, l.cantidad_inicial, l.stock_actual\nORDER BY unidades_vendidas, l.id_lote;",
+   "sql": "SELECT  l.id_lote, l.numero_lote, p.nombre AS producto, l.cantidad_inicial, l.stock_actual,\n        COUNT(d.id_detalle)       AS lineas_de_venta,\n        ISNULL(SUM(d.cantidad), 0) AS unidades_vendidas\nFROM    Lote l\nINNER JOIN Producto p ON p.id_producto = l.id_producto\nLEFT JOIN  Detalle_Venta d ON d.id_lote = l.id_lote\nGROUP BY l.id_lote, l.numero_lote, p.nombre, l.cantidad_inicial, l.stock_actual\nORDER BY unidades_vendidas, l.id_lote"
+  },
+  {
+   "id": "M15",
+   "titulo": "Lotes y sus líneas de venta, desde el lado del lote (RIGHT JOIN)",
+   "enunciado": "El almacenero necesita listar todos los lotes y, si existen, las ventas en las que participaron, para detectar rápidamente los lotes que aún no se han vendido.",
+   "objetivo": "Aplicar RIGHT JOIN conservando todos los registros de la tabla derecha (Lote).",
+   "explicacion": "Detalle_Venta se coloca a la izquierda y Lote a la derecha. RIGHT JOIN conserva todos los lotes; los que no tienen líneas de venta aparecen con NULL en id_detalle y se marcan con la columna situacion.",
+   "codigo": "SELECT  l.id_lote, l.numero_lote, d.id_venta, d.cantidad,\n        CASE WHEN d.id_detalle IS NULL THEN 'SIN VENTAS' ELSE 'CON VENTAS' END AS situacion\nFROM    Detalle_Venta d\nRIGHT JOIN Lote l ON l.id_lote = d.id_lote\nORDER BY situacion, l.id_lote, d.id_venta;",
+   "sql": "SELECT  l.id_lote, l.numero_lote, d.id_venta, d.cantidad,\n        CASE WHEN d.id_detalle IS NULL THEN 'SIN VENTAS' ELSE 'CON VENTAS' END AS situacion\nFROM    Detalle_Venta d\nRIGHT JOIN Lote l ON l.id_lote = d.id_lote\nORDER BY situacion, l.id_lote, d.id_venta"
+  },
+  {
+   "id": "M16",
+   "titulo": "Clientes y sus ventas, desde el lado del cliente (RIGHT JOIN)",
+   "enunciado": "El área comercial quiere ver todos los clientes con las ventas que realizaron, resaltando a los que nunca compraron, para campañas de reactivación.",
+   "objetivo": "Aplicar RIGHT JOIN para priorizar la tabla Cliente.",
+   "explicacion": "Venta se escribe a la izquierda y Cliente a la derecha. Con RIGHT JOIN todos los clientes se conservan; los que no tienen ventas muestran NULL en las columnas de Venta.",
+   "codigo": "SELECT  c.id_cliente, c.nombres + N' ' + c.apellidos AS cliente, c.distrito,\n        v.id_venta, v.fecha_venta, v.total\nFROM    Venta v\nRIGHT JOIN Cliente c ON c.id_cliente = v.id_cliente\nORDER BY c.id_cliente, v.fecha_venta;",
+   "sql": "SELECT  c.id_cliente, c.nombres + N' ' + c.apellidos AS cliente, c.distrito,\n        v.id_venta, v.fecha_venta, v.total\nFROM    Venta v\nRIGHT JOIN Cliente c ON c.id_cliente = v.id_cliente\nORDER BY c.id_cliente, v.fecha_venta"
+  },
+  {
+   "id": "M17",
+   "titulo": "Empleados y las ventas que atendieron (RIGHT JOIN)",
+   "enunciado": "La administración necesita la actividad de cada empleado: listar a todos los empleados con sus ventas y el comprobante emitido, mostrando a quienes no registraron ninguna.",
+   "objetivo": "Aplicar RIGHT JOIN con encadenamiento de una tabla adicional.",
+   "explicacion": "Comprobante y Venta se unen a la izquierda mediante INNER JOIN y el resultado se une por RIGHT JOIN con Empleado, de modo que todos los empleados permanecen aunque no tengan ventas.",
+   "codigo": "SELECT  e.id_empleado, e.usuario, e.rol, v.id_venta, k.serie, k.numero\nFROM    Comprobante k\nINNER JOIN Venta v ON v.id_venta = k.id_venta\nRIGHT JOIN Empleado e ON e.id_empleado = v.id_empleado\nORDER BY e.id_empleado, v.id_venta;",
+   "sql": "SELECT  e.id_empleado, e.usuario, e.rol, v.id_venta, k.serie, k.numero\nFROM    Comprobante k\nINNER JOIN Venta v ON v.id_venta = k.id_venta\nRIGHT JOIN Empleado e ON e.id_empleado = v.id_empleado\nORDER BY e.id_empleado, v.id_venta"
+  },
+  {
+   "id": "M18",
+   "titulo": "Conciliación de clientes y ventas (FULL JOIN)",
+   "enunciado": "Se necesita una vista conjunta que muestre las ventas con su cliente, los clientes que no tienen ventas y las ventas sin cliente identificado.",
+   "objetivo": "Aplicar FULL JOIN para conservar los registros sin correspondencia en ambos lados.",
+   "explicacion": "FULL JOIN entre Cliente y Venta devuelve coincidencias, clientes sin ventas (id_venta NULL) y ventas sin cliente (id_cliente NULL). La columna situacion clasifica cada fila.",
+   "codigo": "SELECT  c.id_cliente, c.nombres + N' ' + c.apellidos AS cliente, v.id_venta, v.total,\n        CASE WHEN v.id_venta   IS NULL THEN 'CLIENTE SIN VENTAS'\n             WHEN c.id_cliente IS NULL THEN 'VENTA SIN CLIENTE'\n             ELSE 'CLIENTE CON VENTA' END AS situacion\nFROM    Cliente c\nFULL JOIN Venta v ON v.id_cliente = c.id_cliente\nORDER BY situacion, c.id_cliente, v.id_venta;",
+   "sql": "SELECT  c.id_cliente, c.nombres + N' ' + c.apellidos AS cliente, v.id_venta, v.total,\n        CASE WHEN v.id_venta   IS NULL THEN 'CLIENTE SIN VENTAS'\n             WHEN c.id_cliente IS NULL THEN 'VENTA SIN CLIENTE'\n             ELSE 'CLIENTE CON VENTA' END AS situacion\nFROM    Cliente c\nFULL JOIN Venta v ON v.id_cliente = c.id_cliente\nORDER BY situacion, c.id_cliente, v.id_venta"
+  },
+  {
+   "id": "M19",
+   "titulo": "Control de ventas y comprobantes (FULL JOIN)",
+   "enunciado": "Contabilidad debe verificar la regla RN-08 (cada venta genera un único comprobante): hay que detectar ventas sin comprobante y comprobantes sin venta.",
+   "objetivo": "Usar FULL JOIN como herramienta de auditoría de integridad.",
+   "explicacion": "FULL JOIN entre Venta y Comprobante deja a la vista las anomalías en cualquier sentido. Con los datos correctos todas las filas tienen ambos lados y el resumen no muestra anomalías.",
+   "codigo": "SELECT  v.id_venta, k.id_comprobante, k.serie, k.numero, v.total,\n        CASE WHEN k.id_comprobante IS NULL THEN 'VENTA SIN COMPROBANTE'\n             WHEN v.id_venta       IS NULL THEN 'COMPROBANTE SIN VENTA'\n             ELSE 'OK' END AS control\nFROM    Venta v\nFULL JOIN Comprobante k ON k.id_venta = v.id_venta\nORDER BY control DESC, v.id_venta;",
+   "sql": "SELECT  v.id_venta, k.id_comprobante, k.serie, k.numero, v.total,\n        CASE WHEN k.id_comprobante IS NULL THEN 'VENTA SIN COMPROBANTE'\n             WHEN v.id_venta       IS NULL THEN 'COMPROBANTE SIN VENTA'\n             ELSE 'OK' END AS control\nFROM    Venta v\nFULL JOIN Comprobante k ON k.id_venta = v.id_venta\nORDER BY control DESC, v.id_venta"
+  },
+  {
+   "id": "M20",
+   "titulo": "Cobertura de abastecimiento: productos y lotes (FULL JOIN)",
+   "enunciado": "El comprador quiere verificar qué productos del catálogo no tienen ningún lote registrado (nunca se compraron) y qué lotes existen para cada producto, en un solo reporte.",
+   "objetivo": "Aplicar FULL JOIN para auditar la relación Producto–Lote en ambos sentidos.",
+   "explicacion": "FULL JOIN entre Producto y Lote muestra los productos sin lotes (id_lote NULL) y, en caso de existir, lotes sin producto (imposible por la clave foránea, lo que confirma la integridad). La columna estado_abastecimiento resume cada fila.",
+   "codigo": "SELECT  p.id_producto, p.nombre AS producto, p.estado, l.id_lote, l.numero_lote, l.stock_actual,\n        CASE WHEN l.id_lote     IS NULL THEN 'SIN LOTES'\n             WHEN p.id_producto IS NULL THEN 'LOTE HUERFANO'\n             WHEN l.stock_actual = 0    THEN 'LOTE AGOTADO'\n             ELSE 'ABASTECIDO' END AS estado_abastecimiento\nFROM    Producto p\nFULL JOIN Lote l ON l.id_producto = p.id_producto\nORDER BY estado_abastecimiento, p.id_producto, l.id_lote;",
+   "sql": "SELECT  p.id_producto, p.nombre AS producto, p.estado, l.id_lote, l.numero_lote, l.stock_actual,\n        CASE WHEN l.id_lote     IS NULL THEN 'SIN LOTES'\n             WHEN p.id_producto IS NULL THEN 'LOTE HUERFANO'\n             WHEN l.stock_actual = 0    THEN 'LOTE AGOTADO'\n             ELSE 'ABASTECIDO' END AS estado_abastecimiento\nFROM    Producto p\nFULL JOIN Lote l ON l.id_producto = p.id_producto\nORDER BY estado_abastecimiento, p.id_producto, l.id_lote"
+  }
+ ]
+}

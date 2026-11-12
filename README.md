@@ -6,6 +6,18 @@ vistas, subconsultas, consultas multitabla y procedimientos almacenados sobre el
 
 [![Pruebas SQL Server](https://github.com/angelonavarroxd23-lab/MINIMARKET-LA-FAVORITA-T3/actions/workflows/sqlserver-tests.yml/badge.svg)](https://github.com/angelonavarroxd23-lab/MINIMARKET-LA-FAVORITA-T3/actions/workflows/sqlserver-tests.yml)
 
+## 🖥️ Aplicación web interactiva (frontend + SQL Server)
+
+Interfaz web real sobre la base: **panel**, **punto de venta** (carrito, stock, comprobante), **ventas** (detalle y anulación), **inventario**, **clientes**, los **26 procedimientos** con formularios, las **15 vistas** y las **35 consultas** con su enunciado, código y resultado en vivo.
+
+[![Abrir en GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/angelonavarroxd23-lab/MINIMARKET-LA-FAVORITA-T3)
+
+- **En GitHub (Codespaces):** pulsa el botón; se crea un entorno en la nube que levanta SQL Server y la aplicación y abre la web (tarda unos minutos la primera vez). Usa tu cuota gratuita de Codespaces.
+- **En tu PC (Docker Desktop):** `powershell -ExecutionPolicy Bypass -File scripts\start_web.ps1` y abre http://localhost:3000. En Linux/macOS: `bash scripts/start_web.sh`.
+- Parar: `docker compose down` (con `-v` borra también los datos). La contraseña de SQL Server se genera al azar en `.env`, que no se sube a git.
+- Es una demostración académica: no hay inicio de sesión de usuarios y la API solo ejecuta los procedimientos, vistas y consultas del proyecto (no acepta SQL libre).
+- Pruebas de la API contra SQL Server: `node tests/web_smoke.js` (81 pruebas); también corren en GitHub Actions (trabajo «web»).
+
 ## ▶ Ejecutar todo en GitHub (sin instalar nada)
 
 **[Abrir el flujo «sqlserver-tests» →](https://github.com/angelonavarroxd23-lab/MINIMARKET-LA-FAVORITA-T3/actions/workflows/sqlserver-tests.yml)** y pulsar **Run workflow** (botón a la derecha) → **Run workflow**.
@@ -40,6 +52,7 @@ Todos los ejercicios tienen enunciado, objetivo, código completo y explicación
 ├── tools/                           generadores (pruebas, evidencias, informe, documentación)
 ├── evidencias/                      transcripciones reales de la ejecución en SQL Server
 ├── docs/                            INFORME_PROYECTO_T3_LA_FAVORITA.docx · VALIDACION_TECNICA.md
+├── app/                             interfaz web (Node + Express) y docker-compose.yml en la raíz
 ├── ci/sqlserver-tests.yml           copia del flujo de GitHub Actions (ver nota)
 ├── .github/workflows/sqlserver-tests.yml
 └── LICENSE

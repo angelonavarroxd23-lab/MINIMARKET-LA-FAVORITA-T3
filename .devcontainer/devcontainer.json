@@ -1,0 +1,8 @@
+﻿{
+  "name": "La Favorita - SQL Server + web",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": { "ghcr.io/devcontainers/features/docker-in-docker:2": {} },
+  "postCreateCommand": "bash scripts/start_web.sh",
+  "forwardPorts": [3000],
+  "portsAttributes": { "3000": { "label": "La Favorita (web)", "onAutoForward": "openBrowser" } }
+}

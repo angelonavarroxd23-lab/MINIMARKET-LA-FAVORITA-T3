@@ -10,3 +10,7 @@ evidencias/ci_log.txt
 .env
 *.pfx
 secrets*
+
+# App web: credenciales y dependencias
+.env
+app/node_modules/

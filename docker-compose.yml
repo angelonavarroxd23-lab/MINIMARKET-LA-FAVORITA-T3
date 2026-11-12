@@ -1,0 +1,47 @@
+# Levanta SQL Server 2022 + crea la base con los scripts de database/ + arranca la interfaz web.
+# Uso: ver scripts/start_web.ps1 (Windows) o scripts/start_web.sh (Linux / Codespaces).
+# La contraseña de SQL Server viene del archivo .env (generado al azar; no se versiona).
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Developer
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:?Falta MSSQL_SA_PASSWORD (ejecuta scripts/start_web.ps1 o start_web.sh)}
+    healthcheck:
+      test: ["CMD-SHELL", "S=$$(ls /opt/mssql-tools*/bin/sqlcmd | tail -1); SQLCMDPASSWORD=\"$$MSSQL_SA_PASSWORD\" $$S -S localhost -U sa -C -Q 'SELECT 1' >/dev/null 2>&1"]
+      interval: 5s
+      timeout: 5s
+      retries: 40
+  init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    user: root
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SQLCMDPASSWORD: ${MSSQL_SA_PASSWORD}
+    volumes:
+      - ./database:/work/database:ro
+    restart: "no"
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        S=$$(ls /opt/mssql-tools*/bin/sqlcmd | tail -1)
+        for f in /work/database/[0-9]*.sql; do
+          echo ">> $$f"
+          $$S -S db -U sa -C -b -I -f 65001 -i "$$f" || exit 1
+        done
+        echo "Base de datos lista."
+  app:
+    build: ./app
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    environment:
+      DB_SERVER: db
+      DB_PASSWORD: ${MSSQL_SA_PASSWORD}
+      PORT: "3000"
+    ports:
+      - "127.0.0.1:3000:3000"
+    restart: unless-stopped

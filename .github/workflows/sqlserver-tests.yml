@@ -61,3 +61,42 @@ jobs:
           name: registro-ejecucion-sqlserver
           path: evidencias_ci/ci_log.txt
           if-no-files-found: warn
+
+  web:
+    # Levanta la interfaz web con SQL Server (docker compose) y prueba la API contra la base real.
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Preparar contraseña (secreto o valor efímero enmascarado)
+        env:
+          SECRET_PW: ${{ secrets.MSSQL_SA_PASSWORD }}
+        run: |
+          PW="$SECRET_PW"
+          if [ -z "$PW" ]; then PW="Ci$(openssl rand -hex 10)!aA1"; fi
+          echo "::add-mask::$PW"
+          printf 'MSSQL_SA_PASSWORD=%s\n' "$PW" > .env
+
+      - name: Levantar base de datos y aplicación
+        run: docker compose up -d --build
+
+      - name: Esperar a la aplicación
+        run: |
+          for i in $(seq 1 90); do
+            if curl -fs http://localhost:3000/api/salud >/dev/null; then echo "Aplicación lista tras $i intento(s)"; exit 0; fi
+            sleep 3
+          done
+          docker compose ps -a; docker compose logs --tail 60; exit 1
+
+      - name: Probar la API contra SQL Server (81 pruebas)
+        run: node tests/web_smoke.js http://localhost:3000 | tee web_smoke.txt
+
+      - name: Registro de la prueba web
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: registro-prueba-web
+          path: web_smoke.txt
+          if-no-files-found: warn

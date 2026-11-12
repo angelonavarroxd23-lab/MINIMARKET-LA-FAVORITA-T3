@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La Favorita — Gestión de ventas e inventario</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <div class="brand"><span class="logo">LF</span><div><h1>Minimarket «La Favorita»</h1><p>Proyecto T3 · SQL Server · <span id="estado">conectando…</span></p></div></div>
+  <nav id="tabs">
+    <button data-tab="panel" class="on">Panel</button>
+    <button data-tab="pos">Punto de venta</button>
+    <button data-tab="ventas">Ventas</button>
+    <button data-tab="inventario">Inventario</button>
+    <button data-tab="clientes">Clientes</button>
+    <button data-tab="procs">Procedimientos</button>
+    <button data-tab="vistas">Vistas</button>
+    <button data-tab="consultas">Consultas</button>
+  </nav>
+</header>
+<main>
+  <section id="tab-panel"></section>
+  <section id="tab-pos" hidden></section>
+  <section id="tab-ventas" hidden></section>
+  <section id="tab-inventario" hidden></section>
+  <section id="tab-clientes" hidden></section>
+  <section id="tab-procs" hidden></section>
+  <section id="tab-vistas" hidden></section>
+  <section id="tab-consultas" hidden></section>
+</main>
+<div id="toast" role="status" aria-live="polite"></div>
+<footer>Demostración académica. Los datos son ficticios. Cada acción ejecuta un procedimiento, vista o consulta real de SQL Server; los errores que ves son los que devuelve la base de datos.</footer>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "name": "la-favorita-web",
+  "version": "1.0.0",
+  "description": "Interfaz web del Proyecto T3 (Minimarket La Favorita) sobre SQL Server",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "license": "MIT",
+  "dependencies": { "express": "4.21.2", "mssql": "11.0.1" }
+}
