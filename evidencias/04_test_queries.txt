@@ -1,0 +1,41 @@
+﻿Changed database context to 'MinimarketLaFavorita'.
+id	prueba	esperado	obtenido	estado
+--	------	--------	--------	------
+TQ-M01	M01: Catálogo de productos con su categoría (INNER JOIN) (filas)	20	20	PASS
+TQ-M02	M02: Lotes con producto, categoría y costo (INNER JOIN de 3 tablas) (filas)	21	21	PASS
+TQ-M03	M03: Detalle de cada venta con cajero, producto y lote (INNER JOIN de 5 tablas) (filas)	37	37	PASS
+TQ-M04	M04: Ventas a clientes identificados (INNER JOIN) (filas)	16	16	PASS
+TQ-M05	M05: Comprobantes con venta y cajero (INNER JOIN) (filas)	20	20	PASS
+TQ-M06	M06: Trazabilidad: lotes vendidos a cada cliente (INNER JOIN de 6 tablas) (filas)	30	30	PASS
+TQ-M07	M07: Ingresos por tipo de categoría (INNER JOIN con GROUP BY) (filas)	3	3	PASS
+TQ-M08	M08: Facturas con cliente y RUC del receptor (INNER JOIN) (filas)	3	3	PASS
+TQ-M09	M09: Ventas por cajero y medio de pago (INNER JOIN con GROUP BY) (filas)	17	17	PASS
+TQ-M10	M10: Todos los productos con sus unidades vendidas (LEFT JOIN) (filas)	20	20	PASS
+TQ-M11	M11: Todos los clientes con su gasto acumulado (LEFT JOIN) (filas)	20	20	PASS
+TQ-M12	M12: Todos los empleados con sus ventas (LEFT JOIN) (filas)	20	20	PASS
+TQ-M13	M13: Categorías con su número de productos y su stock (LEFT JOIN) (filas)	20	20	PASS
+TQ-M14	M14: Lotes con sus ventas, incluidos los que no rotan (LEFT JOIN) (filas)	21	21	PASS
+TQ-M15	M15: Lotes y sus líneas de venta, desde el lado del lote (RIGHT JOIN) (filas)	39	39	PASS
+TQ-M16	M16: Clientes y sus ventas, desde el lado del cliente (RIGHT JOIN) (filas)	21	21	PASS
+TQ-M17	M17: Empleados y las ventas que atendieron (RIGHT JOIN) (filas)	27	27	PASS
+TQ-M18	M18: Conciliación de clientes y ventas (FULL JOIN) (filas)	25	25	PASS
+TQ-M19	M19: Control de ventas y comprobantes (FULL JOIN) (filas)	20	20	PASS
+TQ-M20	M20: Cobertura de abastecimiento: productos y lotes (FULL JOIN) (filas)	22	22	PASS
+TQ-S01	S01: Productos con precio superior al promedio (filas)	8	8	PASS
+TQ-S02	S02: Productos que nunca se han vendido (filas)	1	1	PASS
+TQ-S03	S03: Clientes registrados que aún no compran (filas)	5	5	PASS
+TQ-S04	S04: Empleados sin ventas registradas (filas)	7	7	PASS
+TQ-S05	S05: Ventas con total superior al promedio (filas)	7	7	PASS
+TQ-S06	S06: Clientes que gastan más que el cliente promedio (filas)	5	5	PASS
+TQ-S07	S07: Producto más vendido por unidades (filas)	1	1	PASS
+TQ-S08	S08: Lotes con menos stock que el promedio de su producto (filas)	2	2	PASS
+TQ-S09	S09: Productos con lotes vencidos o por vencer (filas)	3	3	PASS
+TQ-S10	S10: Categorías con al menos un producto agotado (filas)	2	2	PASS
+TQ-S11	S11: Fecha de la última compra de cada cliente (filas)	20	20	PASS
+TQ-S12	S12: Producto más caro de cada categoría (filas)	15	15	PASS
+TQ-S13	S13: Ventas posiblemente duplicadas (filas)	2	2	PASS
+TQ-S14	S14: Ventas pagadas con el medio de pago más utilizado (filas)	7	7	PASS
+TQ-S15	S15: Participación de cada categoría en los ingresos (filas)	14	14	PASS
+pruebas	aprobadas	fallidas
+-------	---------	--------
+35	35	0

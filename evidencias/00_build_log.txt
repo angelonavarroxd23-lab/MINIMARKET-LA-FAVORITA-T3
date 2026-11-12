@@ -1,0 +1,596 @@
+﻿
+=== 01_create_database.sql  (codigo de salida: 0)
+Changed database context to 'master'.
+=== 02_create_tables.sql  (codigo de salida: 0)
+Changed database context to 'MinimarketLaFavorita'.
+=== 03_insert_data.sql  (codigo de salida: 0)
+Changed database context to 'MinimarketLaFavorita'.
+
+(20 rows affected)
+
+(20 rows affected)
+
+(21 rows affected)
+
+(20 rows affected)
+
+(20 rows affected)
+
+(20 rows affected)
+
+(37 rows affected)
+
+(20 rows affected)
+=== 04_views.sql  (codigo de salida: 0)
+Changed database context to 'MinimarketLaFavorita'.
+=== 05_subqueries.sql  (codigo de salida: 0)
+Changed database context to 'MinimarketLaFavorita'.
+id_producto nombre                                                                                               precio_venta
+----------- ---------------------------------------------------------------------------------------------------- ------------
+          1 Arroz extra 5 kg                                                                                            21.50
+          2 Az├║car rubia 5 kg                                                                                           18.00
+         11 Gaseosa cola 3 L                                                                                            12.50
+         17 Detergente en polvo 900 g                                                                                   10.90
+          3 Aceite vegetal 1 L                                                                                           9.80
+         16 Caf├® instant├íneo 50 g                                                                                        8.90
+          7 Pan de molde blanco 600 g                                                                                    7.90
+         20 Pilas AA x2                                                                                                  7.50
+
+(8 rows affected)
+id_producto nombre                                                                                               estado  
+----------- ---------------------------------------------------------------------------------------------------- --------
+         20 Pilas AA x2                                                                                          INACTIVO
+
+(1 rows affected)
+id_cliente  nombres                                            apellidos                                          telefono  fecha_registro  
+----------- -------------------------------------------------- -------------------------------------------------- --------- ----------------
+         16 Gabriela                                           Aguilar Medina                                     934678901       2026-10-09
+         17 Andr├®s                                             Rivera Campos                                      945789012       2026-10-12
+         18 Patricia                                           Salazar N├║├▒ez                                      NULL            2026-10-14
+         19 Fernando                                           Lozano Ortiz                                       956890123       2026-10-16
+         20 Milagros                                           Benites Ramos                                      967901234       2026-10-18
+
+(5 rows affected)
+id_empleado nombres                                            apellidos                                          rol        activo
+----------- -------------------------------------------------- -------------------------------------------------- ---------- ------
+          1 Carlos Alberto                                     P├®rez G├│mez                                        SUPERADMIN      1
+          2 Ana Mar├¡a                                          Torres Rojas                                       ADMIN           1
+         16 Fiorella Andrea                                    Cueva Ramos                                        ADMIN           1
+         17 Edwin Omar                                         Laura Condori                                      CAJERO          0
+         18 Yessenia Marisol                                   Tapia Ruiz                                         CAJERO          1
+         19 Jhon Paul                                          Gamarra Lazo                                       CAJERO          1
+         20 Rosa Ang├®lica                                      Inga Salcedo                                       CAJERO          1
+
+(7 rows affected)
+id_venta    fecha_venta                            tipo_pago total       
+----------- -------------------------------------- --------- ------------
+          8                    2026-10-07 15:30:00 TARJETA          86.00
+         12                    2026-10-11 18:15:00 TARJETA          45.80
+          4                    2026-10-03 11:20:00 TARJETA          44.60
+         13                    2026-10-12 19:00:00 EFECTIVO         32.60
+         18                    2026-10-17 20:10:00 PLIN             30.20
+          1                    2026-10-01 08:30:00 EFECTIVO         29.10
+         17                    2026-10-16 12:35:00 TARJETA          27.70
+
+(7 rows affected)
+id_cliente  cliente                                                                                               gasto_total                             
+----------- ----------------------------------------------------------------------------------------------------- ----------------------------------------
+          6 Luc├¡a Fernanda Vargas Ch├ívez                                                                                                             86.00
+          9 Miguel ├üngel Torres Huerta                                                                                                               45.80
+          3 Carlos Daniel Salinas C├írdenas                                                                                                           44.60
+         15 Ricardo Palacios Vega                                                                                                                    37.40
+         10 Sof├¡a Isabel Mendoza Rojas                                                                                                               32.60
+
+(5 rows affected)
+id_producto nombre                                                                                               unidades_vendidas
+----------- ---------------------------------------------------------------------------------------------------- -----------------
+         13 Agua sin gas 625 ml                                                                                                 10
+
+(1 rows affected)
+id_lote     id_producto numero_lote                    stock_actual
+----------- ----------- ------------------------------ ------------
+         20           1 LT-ARZ-2610B                             30
+         21          13 LT-AGU-2610B                             48
+
+(2 rows affected)
+id_producto nombre                                                                                               estado  
+----------- ---------------------------------------------------------------------------------------------------- --------
+          8 Jamonada 250 g                                                                                       ACTIVO  
+          7 Pan de molde blanco 600 g                                                                            ACTIVO  
+          6 Yogurt de fresa 1 L                                                                                  ACTIVO  
+
+(3 rows affected)
+id_categoria nombre                                             tipo      
+------------ -------------------------------------------------- ----------
+          10 Jugos y n├®ctares                                   BEBIDA    
+          19 Pilas y focos                                      GENERAL   
+
+(2 rows affected)
+id_cliente  cliente                                                                                               ultima_compra                          ultima_compra_texto 
+----------- ----------------------------------------------------------------------------------------------------- -------------------------------------- --------------------
+         15 Ricardo Palacios Vega                                                                                                    2026-10-18 09:06:00 2026-10-18 09:06:00 
+         14 Valeria Espinoza Cruz                                                                                                    2026-10-17 20:10:00 2026-10-17 20:10:00 
+         13 Luis Alberto Guti├®rrez D├¡az                                                                                              2026-10-16 12:35:00 2026-10-16 12:35:00 
+         12 Carmen Rosa ├æahui Poma                                                                                                   2026-10-14 11:55:00 2026-10-14 11:55:00 
+         11 Diego Alonso C├│rdova Le├│n                                                                                                2026-10-13 08:40:00 2026-10-13 08:40:00 
+         10 Sof├¡a Isabel Mendoza Rojas                                                                                               2026-10-12 19:00:00 2026-10-12 19:00:00 
+          9 Miguel ├üngel Torres Huerta                                                                                               2026-10-11 18:15:00 2026-10-11 18:15:00 
+          8 Ana Luc├¡a Castillo Paredes                                                                                               2026-10-09 09:50:00 2026-10-09 09:50:00 
+          7 Jorge Luis Ram├¡rez Soto                                                                                                  2026-10-08 16:45:00 2026-10-08 16:45:00 
+          6 Luc├¡a Fernanda Vargas Ch├ívez                                                                                             2026-10-07 15:30:00 2026-10-07 15:30:00 
+          5 Pedro Pablo Quispe Mamani                                                                                                2026-10-06 14:10:00 2026-10-06 14:10:00 
+          4 Rosa Elena Huam├ín Flores                                                                                                 2026-10-04 12:05:00 2026-10-04 12:05:00 
+          3 Carlos Daniel Salinas C├írdenas                                                                                           2026-10-03 11:20:00 2026-10-03 11:20:00 
+          2 Mar├¡a Teresa G├│mez Ramos                                                                                                 2026-10-01 09:15:00 2026-10-01 09:15:00 
+          1 Juan Jos├® P├®rez Alva                                                                                                     2026-10-01 08:30:00 2026-10-01 08:30:00 
+         16 Gabriela Aguilar Medina                                                                                                                 NULL Sin compras         
+         17 Andr├®s Rivera Campos                                                                                                                    NULL Sin compras         
+         18 Patricia Salazar N├║├▒ez                                                                                                                  NULL Sin compras         
+         19 Fernando Lozano Ortiz                                                                                                                   NULL Sin compras         
+         20 Milagros Benites Ramos                                                                                                                  NULL Sin compras         
+
+(20 rows affected)
+categoria                                          producto                                                                                             precio_venta
+-------------------------------------------------- ---------------------------------------------------------------------------------------------------- ------------
+Abarrotes                                          Arroz extra 5 kg                                                                                            21.50
+Gaseosas                                           Gaseosa cola 3 L                                                                                            12.50
+Detergentes                                        Detergente en polvo 900 g                                                                                   10.90
+Infusiones y caf├®                                  Caf├® instant├íneo 50 g                                                                                        8.90
+Panader├¡a                                          Pan de molde blanco 600 g                                                                                    7.90
+Pilas y focos                                      Pilas AA x2                                                                                                  7.50
+L├ícteos                                            Yogurt de fresa 1 L                                                                                          6.50
+Conservas                                          At├║n en trozos 170 g                                                                                         6.20
+Papel y servilletas                                Papel higi├®nico x4                                                                                           5.90
+Embutidos                                          Jamonada 250 g                                                                                               5.60
+Jugos y n├®ctares                                   N├®ctar de durazno 1 L                                                                                        4.50
+Bebidas energizantes                               Bebida energizante 473 ml                                                                                    3.50
+Limpiadores del hogar                              Lej├¡a 1 L                                                                                                    3.20
+Snacks y golosinas                                 Galleta de soda x6                                                                                           2.50
+Aguas                                              Agua sin gas 625 ml                                                                                          1.50
+
+(15 rows affected)
+id_venta    fecha_venta                            id_empleado id_cliente  tipo_pago total       
+----------- -------------------------------------- ----------- ----------- --------- ------------
+         19                    2026-10-18 09:05:00          15          15 YAPE             18.70
+         20                    2026-10-18 09:06:00          15          15 YAPE             18.70
+
+(2 rows affected)
+id_venta    fecha_venta                            tipo_pago total       
+----------- -------------------------------------- --------- ------------
+          1                    2026-10-01 08:30:00 EFECTIVO         29.10
+          3                    2026-10-02 10:05:00 EFECTIVO         11.00
+          7                    2026-10-06 14:10:00 EFECTIVO         17.30
+         10                    2026-10-09 09:50:00 EFECTIVO         21.90
+         13                    2026-10-12 19:00:00 EFECTIVO         32.60
+         15                    2026-10-14 11:55:00 EFECTIVO         17.80
+         16                    2026-10-15 17:25:00 EFECTIVO         22.50
+
+(7 rows affected)
+categoria                                          ingreso                                  porcentaje
+-------------------------------------------------- ---------------------------------------- ----------
+Abarrotes                                                                            198.50      37.22
+Gaseosas                                                                              57.50      10.78
+Panader├¡a                                                                             47.40       8.89
+Detergentes                                                                           32.70       6.13
+L├ícteos                                                                               32.10       6.02
+Embutidos                                                                             28.00       5.25
+Jugos y n├®ctares                                                                      27.00       5.06
+Infusiones y caf├®                                                                     26.70       5.01
+Conservas                                                                             24.80       4.65
+Papel y servilletas                                                                   17.70       3.32
+Aguas                                                                                 15.00       2.81
+Snacks y golosinas                                                                    12.50       2.34
+Bebidas energizantes                                                                   7.00       1.31
+Limpiadores del hogar                                                                  6.40       1.20
+
+(14 rows affected)
+=== 06_multitable_queries.sql  (codigo de salida: 0)
+Changed database context to 'MinimarketLaFavorita'.
+id_producto codigo_barras producto                                                                                             categoria                                          tipo       precio_venta estado  
+----------- ------------- ---------------------------------------------------------------------------------------------------- -------------------------------------------------- ---------- ------------ --------
+          3 7750100100032 Aceite vegetal 1 L                                                                                   Abarrotes                                          ALIMENTO           9.80 ACTIVO  
+          1 7750100100018 Arroz extra 5 kg                                                                                     Abarrotes                                          ALIMENTO          21.50 ACTIVO  
+          2 7750100100025 Az├║car rubia 5 kg                                                                                    Abarrotes                                          ALIMENTO          18.00 ACTIVO  
+          4 7750100100049 Fideo spaghetti 500 g                                                                                Abarrotes                                          ALIMENTO           3.80 ACTIVO  
+          9 7750100100094 At├║n en trozos 170 g                                                                                 Conservas                                          ALIMENTO           6.20 ACTIVO  
+          8 7750100100087 Jamonada 250 g                                                                                       Embutidos                                          ALIMENTO           5.60 ACTIVO  
+          5 7750100100056 Leche evaporada 400 g                                                                                L├ícteos                                            ALIMENTO           4.20 ACTIVO  
+          6 7750100100063 Yogurt de fresa 1 L                                                                                  L├ícteos                                            ALIMENTO           6.50 ACTIVO  
+          7 7750100100070 Pan de molde blanco 600 g                                                                            Panader├¡a                                          ALIMENTO           7.90 ACTIVO  
+         10 7750100100100 Galleta de soda x6                                                                                   Snacks y golosinas                                 ALIMENTO           2.50 ACTIVO  
+         13 7750100100131 Agua sin gas 625 ml                                                                                  Aguas                                              BEBIDA             1.50 ACTIVO  
+         15 7750100100155 Bebida energizante 473 ml                                                                            Bebidas energizantes                               BEBIDA             3.50 ACTIVO  
+         11 7750100100117 Gaseosa cola 3 L                                                                                     Gaseosas                                           BEBIDA            12.50 ACTIVO  
+         12 7750100100124 Gaseosa cola 500 ml                                                                                  Gaseosas                                           BEBIDA             2.50 ACTIVO  
+         16 7750100100162 Caf├® instant├íneo 50 g                                                                                Infusiones y caf├®                                  BEBIDA             8.90 ACTIVO  
+         14 7750100100148 N├®ctar de durazno 1 L                                                                                Jugos y n├®ctares                                   BEBIDA             4.50 ACTIVO  
+         20 7750100100209 Pilas AA x2                                                                                          Pilas y focos                                      GENERAL            7.50 INACTIVO
+         17 7750100100179 Detergente en polvo 900 g                                                                            Detergentes                                        LIMPIEZA          10.90 ACTIVO  
+         18 7750100100186 Lej├¡a 1 L                                                                                            Limpiadores del hogar                              LIMPIEZA           3.20 ACTIVO  
+         19 7750100100193 Papel higi├®nico x4                                                                                   Papel y servilletas                                LIMPIEZA           5.90 ACTIVO  
+
+(20 rows affected)
+id_lote     numero_lote                    producto                                                                                             categoria                                          fecha_ingreso    fecha_vencimiento cantidad_inicial stock_actual costo_unitario
+----------- ------------------------------ ---------------------------------------------------------------------------------------------------- -------------------------------------------------- ---------------- ----------------- ---------------- ------------ --------------
+         17 LT-DET-2609A                   Detergente en polvo 900 g                                                                            Detergentes                                              2026-09-03        2028-09-03               20           17           8.30
+         18 LT-LEJ-2609A                   Lej├¡a 1 L                                                                                            Limpiadores del hogar                                    2026-09-03        2027-09-03               24           22           2.10
+         19 LT-PAP-2609A                   Papel higi├®nico x4                                                                                   Papel y servilletas                                      2026-09-04              NULL               30           27           4.10
+          1 LT-ARZ-2609A                   Arroz extra 5 kg                                                                                     Abarrotes                                                2026-09-05        2027-09-05               40           35          18.20
+          2 LT-AZR-2609A                   Az├║car rubia 5 kg                                                                                    Abarrotes                                                2026-09-06        2027-09-06               40           37          15.10
+          3 LT-ACE-2609A                   Aceite vegetal 1 L                                                                                   Abarrotes                                                2026-09-08        2027-06-30               48           45           8.10
+          4 LT-FID-2609A                   Fideo spaghetti 500 g                                                                                Abarrotes                                                2026-09-10        2027-12-31               60           58           2.90
+          5 LT-LEV-2609A                   Leche evaporada 400 g                                                                                L├ícteos                                                  2026-09-12        2027-03-15               48           45           3.40
+          9 LT-ATU-2609A                   At├║n en trozos 170 g                                                                                 Conservas                                                2026-09-15        2029-09-15               36           32           4.70
+         16 LT-CAF-2609A                   Caf├® instant├íneo 50 g                                                                                Infusiones y caf├®                                        2026-09-18        2028-03-18                8            5           6.70
+         10 LT-GAL-2609A                   Galleta de soda x6                                                                                   Snacks y golosinas                                       2026-09-20        2027-03-20               40           35           1.80
+         11 LT-GC3-2609A                   Gaseosa cola 3 L                                                                                     Gaseosas                                                 2026-09-25        2027-01-25               24           21           9.60
+         12 LT-GC5-2609X                   Gaseosa cola 500 ml                                                                                  Gaseosas                                                 2026-09-25        2027-01-10               48           40           1.70
+         13 LT-AGU-2609A                   Agua sin gas 625 ml                                                                                  Aguas                                                    2026-09-28        2027-09-28               60           50            .90
+         14 LT-NEC-2610A                   N├®ctar de durazno 1 L                                                                                Jugos y n├®ctares                                         2026-10-01        2026-12-15                6            0           3.20
+         15 LT-ENE-2610A                   Bebida energizante 473 ml                                                                            Bebidas energizantes                                     2026-10-02        2027-10-02               24           22           2.40
+          6 LT-YOG-2610A                   Yogurt de fresa 1 L                                                                                  L├ícteos                                                  2026-10-08        2026-11-05               20           17           4.90
+          8 LT-JAM-2610A                   Jamonada 250 g                                                                                       Embutidos                                                2026-10-12        2026-11-02               10            5           4.10
+          7 LT-PAN-2610A                   Pan de molde blanco 600 g                                                                            Panader├¡a                                                2026-10-14        2026-10-29               10            4           5.80
+         21 LT-AGU-2610B                   Agua sin gas 625 ml                                                                                  Aguas                                                    2026-10-15        2027-10-15               48           48            .95
+         20 LT-ARZ-2610B                   Arroz extra 5 kg                                                                                     Abarrotes                                                2026-10-18        2027-10-18               30           30          18.50
+
+(21 rows affected)
+id_venta    fecha_venta                            cajero                         producto                                                                                             numero_lote                    cantidad    precio_unitario subtotal    
+----------- -------------------------------------- ------------------------------ ---------------------------------------------------------------------------------------------------- ------------------------------ ----------- --------------- ------------
+          1                    2026-10-01 08:30:00 lmendoza                       Arroz extra 5 kg                                                                                     LT-ARZ-2609A                             1           21.50        21.50
+          1                    2026-10-01 08:30:00 lmendoza                       Fideo spaghetti 500 g                                                                                LT-FID-2609A                             2            3.80         7.60
+          2                    2026-10-01 09:15:00 krios                          Az├║car rubia 5 kg                                                                                    LT-AZR-2609A                             1           18.00        18.00
+          3                    2026-10-02 10:05:00 jhuamani                       Agua sin gas 625 ml                                                                                  LT-AGU-2609A                             4            1.50         6.00
+          3                    2026-10-02 10:05:00 jhuamani                       Galleta de soda x6                                                                                   LT-GAL-2609A                             2            2.50         5.00
+          4                    2026-10-03 11:20:00 lmendoza                       Aceite vegetal 1 L                                                                                   LT-ACE-2609A                             2            9.80        19.60
+          4                    2026-10-03 11:20:00 lmendoza                       Leche evaporada 400 g                                                                                LT-LEV-2609A                             3            4.20        12.60
+          4                    2026-10-03 11:20:00 lmendoza                       At├║n en trozos 170 g                                                                                 LT-ATU-2609A                             2            6.20        12.40
+          5                    2026-10-04 12:05:00 dacosta                        Gaseosa cola 3 L                                                                                     LT-GC3-2609A                             1           12.50        12.50
+          5                    2026-10-04 12:05:00 dacosta                        Gaseosa cola 500 ml                                                                                  LT-GC5-2609X                             2            2.50         5.00
+          6                    2026-10-05 13:40:00 msaavedra                      Jamonada 250 g                                                                                       LT-JAM-2610A                             2            5.60        11.20
+          6                    2026-10-05 13:40:00 msaavedra                      Pan de molde blanco 600 g                                                                            LT-PAN-2610A                             1            7.90         7.90
+          7                    2026-10-06 14:10:00 krios                          Detergente en polvo 900 g                                                                            LT-DET-2609A                             1           10.90        10.90
+          7                    2026-10-06 14:10:00 krios                          Lej├¡a 1 L                                                                                            LT-LEJ-2609A                             2            3.20         6.40
+          8                    2026-10-07 15:30:00 sdelgado                       Arroz extra 5 kg                                                                                     LT-ARZ-2609A                             4           21.50        86.00
+          9                    2026-10-08 16:45:00 rpaucar                        N├®ctar de durazno 1 L                                                                                LT-NEC-2610A                             3            4.50        13.50
+          9                    2026-10-08 16:45:00 rpaucar                        Bebida energizante 473 ml                                                                            LT-ENE-2610A                             2            3.50         7.00
+         10                    2026-10-09 09:50:00 jhuamani                       Caf├® instant├íneo 50 g                                                                                LT-CAF-2609A                             1            8.90         8.90
+         10                    2026-10-09 09:50:00 jhuamani                       Yogurt de fresa 1 L                                                                                  LT-YOG-2610A                             2            6.50        13.00
+         11                    2026-10-10 10:30:00 marce                          Papel higi├®nico x4                                                                                   LT-PAP-2609A                             2            5.90        11.80
+         12                    2026-10-11 18:15:00 dacosta                        Az├║car rubia 5 kg                                                                                    LT-AZR-2609A                             2           18.00        36.00
+         12                    2026-10-11 18:15:00 dacosta                        Aceite vegetal 1 L                                                                                   LT-ACE-2609A                             1            9.80         9.80
+         13                    2026-10-12 19:00:00 kccahuana                      Jamonada 250 g                                                                                       LT-JAM-2610A                             3            5.60        16.80
+         13                    2026-10-12 19:00:00 kccahuana                      Pan de molde blanco 600 g                                                                            LT-PAN-2610A                             2            7.90        15.80
+         14                    2026-10-13 08:40:00 lyupanqui                      N├®ctar de durazno 1 L                                                                                LT-NEC-2610A                             3            4.50        13.50
+         14                    2026-10-13 08:40:00 lyupanqui                      Agua sin gas 625 ml                                                                                  LT-AGU-2609A                             6            1.50         9.00
+         15                    2026-10-14 11:55:00 msaavedra                      Caf├® instant├íneo 50 g                                                                                LT-CAF-2609A                             2            8.90        17.80
+         16                    2026-10-15 17:25:00 bchumpitaz                     Gaseosa cola 500 ml                                                                                  LT-GC5-2609X                             6            2.50        15.00
+         16                    2026-10-15 17:25:00 bchumpitaz                     Galleta de soda x6                                                                                   LT-GAL-2609A                             3            2.50         7.50
+         17                    2026-10-16 12:35:00 lmendoza                       Detergente en polvo 900 g                                                                            LT-DET-2609A                             2           10.90        21.80
+         17                    2026-10-16 12:35:00 lmendoza                       Papel higi├®nico x4                                                                                   LT-PAP-2609A                             1            5.90         5.90
+         18                    2026-10-17 20:10:00 gfuentes                       Pan de molde blanco 600 g                                                                            LT-PAN-2610A                             3            7.90        23.70
+         18                    2026-10-17 20:10:00 gfuentes                       Yogurt de fresa 1 L                                                                                  LT-YOG-2610A                             1            6.50         6.50
+         19                    2026-10-18 09:05:00 hmejia                         Gaseosa cola 3 L                                                                                     LT-GC3-2609A                             1           12.50        12.50
+         19                    2026-10-18 09:05:00 hmejia                         At├║n en trozos 170 g                                                                                 LT-ATU-2609A                             1            6.20         6.20
+         20                    2026-10-18 09:06:00 hmejia                         Gaseosa cola 3 L                                                                                     LT-GC3-2609A                             1           12.50        12.50
+         20                    2026-10-18 09:06:00 hmejia                         At├║n en trozos 170 g                                                                                 LT-ATU-2609A                             1            6.20         6.20
+
+(37 rows affected)
+id_venta    fecha_venta                            dni      cliente                                                                                               distrito                                 cajero                         tipo_pago total       
+----------- -------------------------------------- -------- ----------------------------------------------------------------------------------------------------- ---------------------------------------- ------------------------------ --------- ------------
+          1                    2026-10-01 08:30:00 10234567 Juan Jos├® P├®rez Alva                                                                                  Comas                                    lmendoza                       EFECTIVO         29.10
+          2                    2026-10-01 09:15:00 10345678 Mar├¡a Teresa G├│mez Ramos                                                                              Comas                                    krios                          YAPE             18.00
+          4                    2026-10-03 11:20:00 10456789 Carlos Daniel Salinas C├írdenas                                                                        Los Olivos                               lmendoza                       TARJETA          44.60
+          5                    2026-10-04 12:05:00 41567890 Rosa Elena Huam├ín Flores                                                                              Comas                                    dacosta                        PLIN             17.50
+          7                    2026-10-06 14:10:00 42678901 Pedro Pablo Quispe Mamani                                                                             Comas                                    krios                          EFECTIVO         17.30
+          8                    2026-10-07 15:30:00 43789012 Luc├¡a Fernanda Vargas Ch├ívez                                                                          Comas                                    sdelgado                       TARJETA          86.00
+          9                    2026-10-08 16:45:00 44890123 Jorge Luis Ram├¡rez Soto                                                                               Independencia                            rpaucar                        YAPE             20.50
+         10                    2026-10-09 09:50:00 45901234 Ana Luc├¡a Castillo Paredes                                                                            Comas                                    jhuamani                       EFECTIVO         21.90
+         12                    2026-10-11 18:15:00 46012345 Miguel ├üngel Torres Huerta                                                                            Carabayllo                               dacosta                        TARJETA          45.80
+         13                    2026-10-12 19:00:00 47123456 Sof├¡a Isabel Mendoza Rojas                                                                            Comas                                    kccahuana                      EFECTIVO         32.60
+         14                    2026-10-13 08:40:00 48234567 Diego Alonso C├│rdova Le├│n                                                                             Los Olivos                               lyupanqui                      YAPE             22.50
+         15                    2026-10-14 11:55:00 49345678 Carmen Rosa ├æahui Poma                                                                                Comas                                    msaavedra                      EFECTIVO         17.80
+         17                    2026-10-16 12:35:00 70456789 Luis Alberto Guti├®rrez D├¡az                                                                           Los Olivos                               lmendoza                       TARJETA          27.70
+         18                    2026-10-17 20:10:00 71567890 Valeria Espinoza Cruz                                                                                 Comas                                    gfuentes                       PLIN             30.20
+         19                    2026-10-18 09:05:00 72678901 Ricardo Palacios Vega                                                                                 Comas                                    hmejia                         YAPE             18.70
+         20                    2026-10-18 09:06:00 72678901 Ricardo Palacios Vega                                                                                 Comas                                    hmejia                         YAPE             18.70
+
+(16 rows affected)
+tipo_comprobante serie numero      fecha_emision                          id_venta    cajero                                                                                                total       
+---------------- ----- ----------- -------------------------------------- ----------- ----------------------------------------------------------------------------------------------------- ------------
+BOLETA           B001            1                    2026-10-01 08:30:00           1 Luis Enrique Mendoza Quispe                                                                                  29.10
+BOLETA           B001            2                    2026-10-01 09:51:00           2 Karina Paola R├¡os Valdivia                                                                                   18.00
+BOLETA           B001            3                    2026-10-02 10:05:00           3 Jos├® Manuel Huaman├¡ Cruz                                                                                     11.00
+BOLETA           B001            4                    2026-10-03 11:20:00           4 Luis Enrique Mendoza Quispe                                                                                  44.60
+BOLETA           B001            5                    2026-10-04 12:05:00           5 Daniela Acosta Bravo                                                                                         17.50
+BOLETA           B001            6                    2026-10-05 13:40:00           6 Mart├¡n Ernesto Saavedra Lima                                                                                 19.10
+BOLETA           B001            7                    2026-10-06 14:10:00           7 Karina Paola R├¡os Valdivia                                                                                   17.30
+BOLETA           B001            8                    2026-10-08 16:46:00           9 Renzo Alejandro Paucar Tello                                                                                 20.50
+BOLETA           B001            9                    2026-10-09 09:50:00          10 Jos├® Manuel Huaman├¡ Cruz                                                                                     21.90
+BOLETA           B001           10                    2026-10-10 10:30:00          11 Milagros del Pilar Arce Nole                                                                                 11.80
+BOLETA           B001           11                    2026-10-12 19:00:00          13 Kevin Jes├║s Ccahuana Rojas                                                                                   32.60
+BOLETA           B001           12                    2026-10-13 08:41:00          14 Lizbeth Carolina Yupanqui Soto                                                                               22.50
+BOLETA           B001           13                    2026-10-14 11:55:00          15 Mart├¡n Ernesto Saavedra Lima                                                                                 17.80
+BOLETA           B001           14                    2026-10-15 17:25:00          16 Bruno Sebasti├ín Chumpitaz Vera                                                                               22.50
+BOLETA           B001           15                    2026-10-17 20:10:00          18 Gianella Roc├¡o Fuentes Alarc├│n                                                                               30.20
+BOLETA           B001           16                    2026-10-18 09:05:00          19 H├®ctor Ra├║l Mej├¡a Pinto                                                                                      18.70
+BOLETA           B001           17                    2026-10-18 09:06:00          20 H├®ctor Ra├║l Mej├¡a Pinto                                                                                      18.70
+FACTURA          F001            1                    2026-10-07 15:30:00           8 Silvia Roxana Delgado Ponce                                                                                  86.00
+FACTURA          F001            2                    2026-10-11 18:15:00          12 Daniela Acosta Bravo                                                                                         45.80
+FACTURA          F001            3                    2026-10-16 12:35:00          17 Luis Enrique Mendoza Quispe                                                                                  27.70
+
+(20 rows affected)
+numero_lote                    producto                                                                                             fecha_venta                            cliente                                                                                               telefono  comprobante     cantidad   
+------------------------------ ---------------------------------------------------------------------------------------------------- -------------------------------------- ----------------------------------------------------------------------------------------------------- --------- --------------- -----------
+LT-ACE-2609A                   Aceite vegetal 1 L                                                                                                      2026-10-03 11:20:00 Carlos Daniel Salinas C├írdenas                                                                        923456789 B001-4                    2
+LT-ACE-2609A                   Aceite vegetal 1 L                                                                                                      2026-10-11 18:15:00 Miguel ├üngel Torres Huerta                                                                            978012345 F001-2                    1
+LT-AGU-2609A                   Agua sin gas 625 ml                                                                                                     2026-10-13 08:40:00 Diego Alonso C├│rdova Le├│n                                                                             990234567 B001-12                   6
+LT-ARZ-2609A                   Arroz extra 5 kg                                                                                                        2026-10-01 08:30:00 Juan Jos├® P├®rez Alva                                                                                  987654321 B001-1                    1
+LT-ARZ-2609A                   Arroz extra 5 kg                                                                                                        2026-10-07 15:30:00 Luc├¡a Fernanda Vargas Ch├ívez                                                                          956780123 F001-1                    4
+LT-ATU-2609A                   At├║n en trozos 170 g                                                                                                    2026-10-03 11:20:00 Carlos Daniel Salinas C├írdenas                                                                        923456789 B001-4                    2
+LT-ATU-2609A                   At├║n en trozos 170 g                                                                                                    2026-10-18 09:05:00 Ricardo Palacios Vega                                                                                 923567890 B001-16                   1
+LT-ATU-2609A                   At├║n en trozos 170 g                                                                                                    2026-10-18 09:06:00 Ricardo Palacios Vega                                                                                 923567890 B001-17                   1
+LT-AZR-2609A                   Az├║car rubia 5 kg                                                                                                       2026-10-01 09:15:00 Mar├¡a Teresa G├│mez Ramos                                                                              912345678 B001-2                    1
+LT-AZR-2609A                   Az├║car rubia 5 kg                                                                                                       2026-10-11 18:15:00 Miguel ├üngel Torres Huerta                                                                            978012345 F001-2                    2
+LT-CAF-2609A                   Caf├® instant├íneo 50 g                                                                                                   2026-10-09 09:50:00 Ana Luc├¡a Castillo Paredes                                                                            967801234 B001-9                    1
+LT-CAF-2609A                   Caf├® instant├íneo 50 g                                                                                                   2026-10-14 11:55:00 Carmen Rosa ├æahui Poma                                                                                NULL      B001-13                   2
+LT-DET-2609A                   Detergente en polvo 900 g                                                                                               2026-10-06 14:10:00 Pedro Pablo Quispe Mamani                                                                             945678012 B001-7                    1
+LT-DET-2609A                   Detergente en polvo 900 g                                                                                               2026-10-16 12:35:00 Luis Alberto Guti├®rrez D├¡az                                                                           901345678 F001-3                    2
+LT-ENE-2610A                   Bebida energizante 473 ml                                                                                               2026-10-08 16:45:00 Jorge Luis Ram├¡rez Soto                                                                               NULL      B001-8                    2
+LT-FID-2609A                   Fideo spaghetti 500 g                                                                                                   2026-10-01 08:30:00 Juan Jos├® P├®rez Alva                                                                                  987654321 B001-1                    2
+LT-GC3-2609A                   Gaseosa cola 3 L                                                                                                        2026-10-04 12:05:00 Rosa Elena Huam├ín Flores                                                                              934567801 B001-5                    1
+LT-GC3-2609A                   Gaseosa cola 3 L                                                                                                        2026-10-18 09:05:00 Ricardo Palacios Vega                                                                                 923567890 B001-16                   1
+LT-GC3-2609A                   Gaseosa cola 3 L                                                                                                        2026-10-18 09:06:00 Ricardo Palacios Vega                                                                                 923567890 B001-17                   1
+LT-GC5-2609X                   Gaseosa cola 500 ml                                                                                                     2026-10-04 12:05:00 Rosa Elena Huam├ín Flores                                                                              934567801 B001-5                    2
+LT-JAM-2610A                   Jamonada 250 g                                                                                                          2026-10-12 19:00:00 Sof├¡a Isabel Mendoza Rojas                                                                            989123456 B001-11                   3
+LT-LEJ-2609A                   Lej├¡a 1 L                                                                                                               2026-10-06 14:10:00 Pedro Pablo Quispe Mamani                                                                             945678012 B001-7                    2
+LT-LEV-2609A                   Leche evaporada 400 g                                                                                                   2026-10-03 11:20:00 Carlos Daniel Salinas C├írdenas                                                                        923456789 B001-4                    3
+LT-NEC-2610A                   N├®ctar de durazno 1 L                                                                                                   2026-10-08 16:45:00 Jorge Luis Ram├¡rez Soto                                                                               NULL      B001-8                    3
+LT-NEC-2610A                   N├®ctar de durazno 1 L                                                                                                   2026-10-13 08:40:00 Diego Alonso C├│rdova Le├│n                                                                             990234567 B001-12                   3
+LT-PAN-2610A                   Pan de molde blanco 600 g                                                                                               2026-10-12 19:00:00 Sof├¡a Isabel Mendoza Rojas                                                                            989123456 B001-11                   2
+LT-PAN-2610A                   Pan de molde blanco 600 g                                                                                               2026-10-17 20:10:00 Valeria Espinoza Cruz                                                                                 912456789 B001-15                   3
+LT-PAP-2609A                   Papel higi├®nico x4                                                                                                      2026-10-16 12:35:00 Luis Alberto Guti├®rrez D├¡az                                                                           901345678 F001-3                    1
+LT-YOG-2610A                   Yogurt de fresa 1 L                                                                                                     2026-10-09 09:50:00 Ana Luc├¡a Castillo Paredes                                                                            967801234 B001-9                    2
+LT-YOG-2610A                   Yogurt de fresa 1 L                                                                                                     2026-10-17 20:10:00 Valeria Espinoza Cruz                                                                                 912456789 B001-15                   1
+
+(30 rows affected)
+tipo       ventas      unidades    ingreso                                 
+---------- ----------- ----------- ----------------------------------------
+ALIMENTO            13          39                                   343.30
+BEBIDA               9          32                                   133.20
+LIMPIEZA             3           8                                    56.80
+
+(3 rows affected)
+serie numero      fecha_emision                          ruc_receptor cliente                                                                                               total       
+----- ----------- -------------------------------------- ------------ ----------------------------------------------------------------------------------------------------- ------------
+F001            1                    2026-10-07 15:30:00 20601234561  Luc├¡a Fernanda Vargas Ch├ívez                                                                                 86.00
+F001            2                    2026-10-11 18:15:00 10460123451  Miguel ├üngel Torres Huerta                                                                                   45.80
+F001            3                    2026-10-16 12:35:00 20605432107  Luis Alberto Guti├®rrez D├¡az                                                                                  27.70
+
+(3 rows affected)
+cajero                         rol        tipo_pago ventas      monto                                   
+------------------------------ ---------- --------- ----------- ----------------------------------------
+bchumpitaz                     CAJERO     EFECTIVO            1                                    22.50
+dacosta                        CAJERO     PLIN                1                                    17.50
+dacosta                        CAJERO     TARJETA             1                                    45.80
+gfuentes                       CAJERO     PLIN                1                                    30.20
+hmejia                         CAJERO     YAPE                2                                    37.40
+jhuamani                       CAJERO     EFECTIVO            2                                    32.90
+kccahuana                      CAJERO     EFECTIVO            1                                    32.60
+krios                          CAJERO     EFECTIVO            1                                    17.30
+krios                          CAJERO     YAPE                1                                    18.00
+lmendoza                       CAJERO     EFECTIVO            1                                    29.10
+lmendoza                       CAJERO     TARJETA             2                                    72.30
+lyupanqui                      CAJERO     YAPE                1                                    22.50
+marce                          CAJERO     PLIN                1                                    11.80
+msaavedra                      CAJERO     EFECTIVO            1                                    17.80
+msaavedra                      CAJERO     YAPE                1                                    19.10
+rpaucar                        CAJERO     YAPE                1                                    20.50
+sdelgado                       ADMIN      TARJETA             1                                    86.00
+
+(17 rows affected)
+id_producto producto                                                                                             estado   unidades_vendidas ingreso                                 
+----------- ---------------------------------------------------------------------------------------------------- -------- ----------------- ----------------------------------------
+         13 Agua sin gas 625 ml                                                                                  ACTIVO                  10                                    15.00
+         12 Gaseosa cola 500 ml                                                                                  ACTIVO                   8                                    20.00
+         14 N├®ctar de durazno 1 L                                                                                ACTIVO                   6                                    27.00
+          7 Pan de molde blanco 600 g                                                                            ACTIVO                   6                                    47.40
+          1 Arroz extra 5 kg                                                                                     ACTIVO                   5                                   107.50
+         10 Galleta de soda x6                                                                                   ACTIVO                   5                                    12.50
+          8 Jamonada 250 g                                                                                       ACTIVO                   5                                    28.00
+          9 At├║n en trozos 170 g                                                                                 ACTIVO                   4                                    24.80
+          3 Aceite vegetal 1 L                                                                                   ACTIVO                   3                                    29.40
+          2 Az├║car rubia 5 kg                                                                                    ACTIVO                   3                                    54.00
+         16 Caf├® instant├íneo 50 g                                                                                ACTIVO                   3                                    26.70
+         17 Detergente en polvo 900 g                                                                            ACTIVO                   3                                    32.70
+         11 Gaseosa cola 3 L                                                                                     ACTIVO                   3                                    37.50
+          5 Leche evaporada 400 g                                                                                ACTIVO                   3                                    12.60
+         19 Papel higi├®nico x4                                                                                   ACTIVO                   3                                    17.70
+          6 Yogurt de fresa 1 L                                                                                  ACTIVO                   3                                    19.50
+         15 Bebida energizante 473 ml                                                                            ACTIVO                   2                                     7.00
+          4 Fideo spaghetti 500 g                                                                                ACTIVO                   2                                     7.60
+         18 Lej├¡a 1 L                                                                                            ACTIVO                   2                                     6.40
+         20 Pilas AA x2                                                                                          INACTIVO                 0                                      .00
+
+(20 rows affected)
+id_cliente  cliente                                                                                               distrito                                 compras     monto_gastado                           
+----------- ----------------------------------------------------------------------------------------------------- ---------------------------------------- ----------- ----------------------------------------
+          6 Luc├¡a Fernanda Vargas Ch├ívez                                                                          Comas                                              1                                    86.00
+          9 Miguel ├üngel Torres Huerta                                                                            Carabayllo                                         1                                    45.80
+          3 Carlos Daniel Salinas C├írdenas                                                                        Los Olivos                                         1                                    44.60
+         15 Ricardo Palacios Vega                                                                                 Comas                                              2                                    37.40
+         10 Sof├¡a Isabel Mendoza Rojas                                                                            Comas                                              1                                    32.60
+         14 Valeria Espinoza Cruz                                                                                 Comas                                              1                                    30.20
+          1 Juan Jos├® P├®rez Alva                                                                                  Comas                                              1                                    29.10
+         13 Luis Alberto Guti├®rrez D├¡az                                                                           Los Olivos                                         1                                    27.70
+         11 Diego Alonso C├│rdova Le├│n                                                                             Los Olivos                                         1                                    22.50
+          8 Ana Luc├¡a Castillo Paredes                                                                            Comas                                              1                                    21.90
+          7 Jorge Luis Ram├¡rez Soto                                                                               Independencia                                      1                                    20.50
+          2 Mar├¡a Teresa G├│mez Ramos                                                                              Comas                                              1                                    18.00
+         12 Carmen Rosa ├æahui Poma                                                                                Comas                                              1                                    17.80
+          4 Rosa Elena Huam├ín Flores                                                                              Comas                                              1                                    17.50
+          5 Pedro Pablo Quispe Mamani                                                                             Comas                                              1                                    17.30
+         16 Gabriela Aguilar Medina                                                                               Independencia                                      0                                      .00
+         17 Andr├®s Rivera Campos                                                                                  Comas                                              0                                      .00
+         18 Patricia Salazar N├║├▒ez                                                                                Comas                                              0                                      .00
+         19 Fernando Lozano Ortiz                                                                                 Carabayllo                                         0                                      .00
+         20 Milagros Benites Ramos                                                                                Comas                                              0                                      .00
+
+(20 rows affected)
+id_empleado usuario                        rol        activo ventas      monto_vendido                           
+----------- ------------------------------ ---------- ------ ----------- ----------------------------------------
+          3 lmendoza                       CAJERO          1           3                                   101.40
+          8 sdelgado                       ADMIN           1           1                                    86.00
+          6 dacosta                        CAJERO          1           2                                    63.30
+         15 hmejia                         CAJERO          1           2                                    37.40
+          7 msaavedra                      CAJERO          1           2                                    36.90
+          4 krios                          CAJERO          1           2                                    35.30
+          5 jhuamani                       CAJERO          1           2                                    32.90
+         11 kccahuana                      CAJERO          1           1                                    32.60
+         14 gfuentes                       CAJERO          1           1                                    30.20
+         12 lyupanqui                      CAJERO          1           1                                    22.50
+         13 bchumpitaz                     CAJERO          1           1                                    22.50
+          9 rpaucar                        CAJERO          1           1                                    20.50
+         10 marce                          CAJERO          1           1                                    11.80
+          1 cperez                         SUPERADMIN      1           0                                      .00
+          2 atorres                        ADMIN           1           0                                      .00
+         16 fcueva                         ADMIN           1           0                                      .00
+         17 elaura                         CAJERO          0           0                                      .00
+         18 ytapia                         CAJERO          1           0                                      .00
+         19 jgamarra                       CAJERO          1           0                                      .00
+         20 ringa                          CAJERO          1           0                                      .00
+
+(20 rows affected)
+id_categoria categoria                                          tipo       productos   stock_total
+------------ -------------------------------------------------- ---------- ----------- -----------
+           7 Frutas y verduras                                  ALIMENTO             0           0
+          10 Jugos y n├®ctares                                   BEBIDA               1           0
+          16 Cuidado personal                                   GENERAL              0           0
+          17 Descartables                                       GENERAL              0           0
+          18 ├Ütiles escolares                                   GENERAL              0           0
+          19 Pilas y focos                                      GENERAL              1           0
+          20 Mascotas                                           GENERAL              0           0
+           3 Panader├¡a                                          ALIMENTO             1           4
+           4 Embutidos                                          ALIMENTO             1           5
+          12 Infusiones y caf├®                                  BEBIDA               1           5
+          13 Detergentes                                        LIMPIEZA             1          17
+          11 Bebidas energizantes                               BEBIDA               1          22
+          14 Limpiadores del hogar                              LIMPIEZA             1          22
+          15 Papel y servilletas                                LIMPIEZA             1          27
+           5 Conservas                                          ALIMENTO             1          32
+           6 Snacks y golosinas                                 ALIMENTO             1          35
+           8 Gaseosas                                           BEBIDA               2          61
+           2 L├ícteos                                            ALIMENTO             2          62
+           9 Aguas                                              BEBIDA               1          98
+           1 Abarrotes                                          ALIMENTO             4         205
+
+(20 rows affected)
+id_lote     numero_lote                    producto                                                                                             cantidad_inicial stock_actual lineas_de_venta unidades_vendidas
+----------- ------------------------------ ---------------------------------------------------------------------------------------------------- ---------------- ------------ --------------- -----------------
+         20 LT-ARZ-2610B                   Arroz extra 5 kg                                                                                                   30           30               0                 0
+         21 LT-AGU-2610B                   Agua sin gas 625 ml                                                                                                48           48               0                 0
+          4 LT-FID-2609A                   Fideo spaghetti 500 g                                                                                              60           58               1                 2
+         15 LT-ENE-2610A                   Bebida energizante 473 ml                                                                                          24           22               1                 2
+         18 LT-LEJ-2609A                   Lej├¡a 1 L                                                                                                          24           22               1                 2
+          2 LT-AZR-2609A                   Az├║car rubia 5 kg                                                                                                  40           37               2                 3
+          3 LT-ACE-2609A                   Aceite vegetal 1 L                                                                                                 48           45               2                 3
+          5 LT-LEV-2609A                   Leche evaporada 400 g                                                                                              48           45               1                 3
+          6 LT-YOG-2610A                   Yogurt de fresa 1 L                                                                                                20           17               2                 3
+         11 LT-GC3-2609A                   Gaseosa cola 3 L                                                                                                   24           21               3                 3
+         16 LT-CAF-2609A                   Caf├® instant├íneo 50 g                                                                                               8            5               2                 3
+         17 LT-DET-2609A                   Detergente en polvo 900 g                                                                                          20           17               2                 3
+         19 LT-PAP-2609A                   Papel higi├®nico x4                                                                                                 30           27               2                 3
+          9 LT-ATU-2609A                   At├║n en trozos 170 g                                                                                               36           32               3                 4
+          1 LT-ARZ-2609A                   Arroz extra 5 kg                                                                                                   40           35               2                 5
+          8 LT-JAM-2610A                   Jamonada 250 g                                                                                                     10            5               2                 5
+         10 LT-GAL-2609A                   Galleta de soda x6                                                                                                 40           35               2                 5
+          7 LT-PAN-2610A                   Pan de molde blanco 600 g                                                                                          10            4               3                 6
+         14 LT-NEC-2610A                   N├®ctar de durazno 1 L                                                                                               6            0               2                 6
+         12 LT-GC5-2609X                   Gaseosa cola 500 ml                                                                                                48           40               2                 8
+         13 LT-AGU-2609A                   Agua sin gas 625 ml                                                                                                60           50               2                10
+
+(21 rows affected)
+id_lote     numero_lote                    id_venta    cantidad    situacion 
+----------- ------------------------------ ----------- ----------- ----------
+          1 LT-ARZ-2609A                             1           1 CON VENTAS
+          1 LT-ARZ-2609A                             8           4 CON VENTAS
+          2 LT-AZR-2609A                             2           1 CON VENTAS
+          2 LT-AZR-2609A                            12           2 CON VENTAS
+          3 LT-ACE-2609A                             4           2 CON VENTAS
+          3 LT-ACE-2609A                            12           1 CON VENTAS
+          4 LT-FID-2609A                             1           2 CON VENTAS
+          5 LT-LEV-2609A                             4           3 CON VENTAS
+          6 LT-YOG-2610A                            10           2 CON VENTAS
+          6 LT-YOG-2610A                            18           1 CON VENTAS
+          7 LT-PAN-2610A                             6           1 CON VENTAS
+          7 LT-PAN-2610A                            13           2 CON VENTAS
+          7 LT-PAN-2610A                            18           3 CON VENTAS
+          8 LT-JAM-2610A                             6           2 CON VENTAS
+          8 LT-JAM-2610A                            13           3 CON VENTAS
+          9 LT-ATU-2609A                             4           2 CON VENTAS
+          9 LT-ATU-2609A                            19           1 CON VENTAS
+          9 LT-ATU-2609A                            20           1 CON VENTAS
+         10 LT-GAL-2609A                             3           2 CON VENTAS
+         10 LT-GAL-2609A                            16           3 CON VENTAS
+         11 LT-GC3-2609A                             5           1 CON VENTAS
+         11 LT-GC3-2609A                            19           1 CON VENTAS
+         11 LT-GC3-2609A                            20           1 CON VENTAS
+         12 LT-GC5-2609X                             5           2 CON VENTAS
+         12 LT-GC5-2609X                            16           6 CON VENTAS
+         13 LT-AGU-2609A                             3           4 CON VENTAS
+         13 LT-AGU-2609A                            14           6 CON VENTAS
+         14 LT-NEC-2610A                             9           3 CON VENTAS
+         14 LT-NEC-2610A                            14           3 CON VENTAS
+         15 LT-ENE-2610A                             9           2 CON VENTAS
+         16 LT-CAF-2609A                            10           1 CON VENTAS
+         16 LT-CAF-2609A                            15           2 CON VENTAS
+         17 LT-DET-2609A                             7           1 CON VENTAS
+         17 LT-DET-2609A                            17           2 CON VENTAS
+         18 LT-LEJ-2609A                             7           2 CON VENTAS
+         19 LT-PAP-2609A                            11           2 CON VENTAS
+         19 LT-PAP-2609A                            17           1 CON VENTAS
+         20 LT-ARZ-2610B                          NULL        NULL SIN VENTAS
+         21 LT-AGU-2610B                          NULL        NULL SIN VENTAS
+
+(39 rows affected)
+id_cliente  cliente                                                                                               distrito                                 id_venta    fecha_venta                            total       
+----------- ----------------------------------------------------------------------------------------------------- ---------------------------------------- ----------- -------------------------------------- ------------
+          1 Juan Jos├® P├®rez Alva                                                                                  Comas                                              1                    2026-10-01 08:30:00        29.10
+          2 Mar├¡a Teresa G├│mez Ramos                                                                              Comas                                              2                    2026-10-01 09:15:00        18.00
+          3 Carlos Daniel Salinas C├írdenas                                                                        Los Olivos                                         4                    2026-10-03 11:20:00        44.60
+          4 Rosa Elena Huam├ín Flores                                                                              Comas                                              5                    2026-10-04 12:05:00        17.50
+          5 Pedro Pablo Quispe Mamani                                                                             Comas                                              7                    2026-10-06 14:10:00        17.30
+          6 Luc├¡a Fernanda Vargas Ch├ívez                                                                          Comas                                              8                    2026-10-07 15:30:00        86.00
+          7 Jorge Luis Ram├¡rez Soto                                                                               Independencia                                      9                    2026-10-08 16:45:00        20.50
+          8 Ana Luc├¡a Castillo Paredes                                                                            Comas                                             10                    2026-10-09 09:50:00        21.90
+          9 Miguel ├üngel Torres Huerta                                                                            Carabayllo                                        12                    2026-10-11 18:15:00        45.80
+         10 Sof├¡a Isabel Mendoza Rojas                                                                            Comas                                             13                    2026-10-12 19:00:00        32.60
+         11 Diego Alonso C├│rdova Le├│n                                                                             Los Olivos                                        14                    2026-10-13 08:40:00        22.50
+         12 Carmen Rosa ├æahui Poma                                                                                Comas                                             15                    2026-10-14 11:55:00        17.80
+         13 Luis Alberto Guti├®rrez D├¡az                                                                           Los Olivos                                        17                    2026-10-16 12:35:00        27.70
+         14 Valeria Espinoza Cruz                                                                                 Comas                                             18                    2026-10-17 20:10:00        30.20
+         15 Ricardo Palacios Vega                                                                                 Comas                                             19                    2026-10-18 09:05:00        18.70
+         15 Ricardo Palacios Vega                                                                                 Comas                                             20                    2026-10-18 09:06:00        18.70
+         16 Gabriela Aguilar Medina                                                                               Independencia                                   NULL                                   NULL         NULL
+         17 Andr├®s Rivera Campos                                                                                  Comas                                           NULL                                   NULL         NULL
+         18 Patricia Salazar N├║├▒ez                                                                                Comas                                           NULL                                   NULL         NULL
+         19 Fernando Lozano Ortiz                                                                                 Carabayllo                                      NULL                                   NULL         NULL
+         20 Milagros Benites Ramos                                                                                Comas                                           NULL                                   NULL         NULL
+
+(21 rows affected)
+id_empleado usuario                        rol        id_venta    serie numero     
+----------- ------------------------------ ---------- ----------- ----- -----------
+          1 cperez                         SUPERADMIN        NULL NULL         NULL
+          2 atorres                        ADMIN             NULL NULL         NULL
+          3 lmendoza                       CAJERO               1 B001            1
+          3 lmendoza                       CAJERO               4 B001            4
+          3 lmendoza                       CAJERO              17 F001            3
+=== 07_procedures_insert.sql  (codigo de salida: 0)
+Changed database context to 'MinimarketLaFavorita'.
+The module 'usp_Venta_Registrar' depends on the missing object 'dbo.usp_Comprobante_Emitir'. The module will still be created; however, it cannot run successfully until the object exists.
+=== 08_procedures_update.sql  (codigo de salida: 0)
+Changed database context to 'MinimarketLaFavorita'.
+=== 09_procedures_delete.sql  (codigo de salida: 0)
+Changed database context to 'MinimarketLaFavorita'.
+=== 10_procedures_select.sql  (codigo de salida: 0)
+Changed database context to 'MinimarketLaFavorita'.

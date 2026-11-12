@@ -1,0 +1,189 @@
+﻿Changed database context to 'MinimarketLaFavorita'.
+id_producto	precio_anterior	precio_nuevo
+-----------	---------------	------------
+3	9.80	10.50
+id_producto	precio_anterior	precio_nuevo
+-----------	---------------	------------
+3	9.80	10.50
+id_lote	stock_anterior	stock_nuevo	motivo
+-------	--------------	-----------	------
+13	50	48	Botellas rotas
+id_producto	codigo_barras	producto	categoria	precio_venta	stock_total	situacion_stock	estado
+-----------	-------------	--------	---------	------------	-----------	---------------	------
+11	7750100100117	Gaseosa cola 3 L	Gaseosas	12.50	21	NORMAL	ACTIVO
+12	7750100100124	Gaseosa cola 500 ml	Gaseosas	2.50	40	NORMAL	ACTIVO
+id_producto	codigo_barras	producto	categoria	precio_venta	stock_total	situacion_stock	estado
+-----------	-------------	--------	---------	------------	-----------	---------------	------
+1	7750100100018	Arroz extra 5 kg	Abarrotes	21.50	65	NORMAL	ACTIVO
+id_producto	codigo_barras	producto	categoria	precio_venta	stock_total	situacion_stock	estado
+-----------	-------------	--------	---------	------------	-----------	---------------	------
+id_producto	producto	id_lote	numero_lote	fecha_vencimiento	cantidad_inicial	stock_actual	valor_costo
+-----------	--------	-------	-----------	-----------------	----------------	------------	-----------
+1	Arroz extra 5 kg	1	LT-ARZ-2609A	2027-09-05	40	35	637.00
+1	Arroz extra 5 kg	20	LT-ARZ-2610B	2027-10-18	30	30	555.00
+id_producto	producto	categoria	stock_total	stock_minimo	faltante_para_minimo	situacion_stock
+-----------	--------	---------	-----------	------------	--------------------	---------------
+14	Néctar de durazno 1 L	Jugos y néctares	0	4	4	AGOTADO
+16	Café instantáneo 50 g	Infusiones y café	5	6	1	ALERTA
+8	Jamonada 250 g	Embutidos	5	6	1	ALERTA
+7	Pan de molde blanco 600 g	Panadería	4	5	1	ALERTA
+id_lote	numero_lote	producto	fecha_vencimiento	dias_para_vencer	stock_actual	valor_en_riesgo	estado_vencimiento
+-------	-----------	--------	-----------------	----------------	------------	---------------	------------------
+7	LT-PAN-2610A	Pan de molde blanco 600 g	2026-10-29	-14	4	23.20	VENCIDO
+8	LT-JAM-2610A	Jamonada 250 g	2026-11-02	-10	5	20.50	VENCIDO
+6	LT-YOG-2610A	Yogurt de fresa 1 L	2026-11-05	-7	17	83.30	VENCIDO
+12	LT-GC5-2609X	Gaseosa cola 500 ml	2027-01-10	59	40	68.00	VIGENTE
+11	LT-GC3-2609A	Gaseosa cola 3 L	2027-01-25	74	21	201.60	VIGENTE
+5	LT-LEV-2609A	Leche evaporada 400 g	2027-03-15	123	45	153.00	VIGENTE
+10	LT-GAL-2609A	Galleta de soda x6	2027-03-20	128	35	63.00	VIGENTE
+3	LT-ACE-2609A	Aceite vegetal 1 L	2027-06-30	230	45	364.50	VIGENTE
+18	LT-LEJ-2609A	Lejía 1 L	2027-09-03	295	22	46.20	VIGENTE
+1	LT-ARZ-2609A	Arroz extra 5 kg	2027-09-05	297	35	637.00	VIGENTE
+2	LT-AZR-2609A	Azúcar rubia 5 kg	2027-09-06	298	37	558.70	VIGENTE
+13	LT-AGU-2609A	Agua sin gas 625 ml	2027-09-28	320	50	45.00	VIGENTE
+15	LT-ENE-2610A	Bebida energizante 473 ml	2027-10-02	324	22	52.80	VIGENTE
+21	LT-AGU-2610B	Agua sin gas 625 ml	2027-10-15	337	48	45.60	VIGENTE
+20	LT-ARZ-2610B	Arroz extra 5 kg	2027-10-18	340	30	555.00	VIGENTE
+4	LT-FID-2609A	Fideo spaghetti 500 g	2027-12-31	414	58	168.20	VIGENTE
+16	LT-CAF-2609A	Café instantáneo 50 g	2028-03-18	492	5	33.50	VIGENTE
+17	LT-DET-2609A	Detergente en polvo 900 g	2028-09-03	661	17	141.10	VIGENTE
+9	LT-ATU-2609A	Atún en trozos 170 g	2029-09-15	1038	32	150.40	VIGENTE
+id_cliente	dni	nombres	apellidos	telefono	direccion	distrito	fecha_registro	compras	monto_acumulado
+----------	---	-------	---------	--------	---------	--------	--------------	-------	---------------
+1	10234567	Juan José	Pérez Alva	987654321	Av. Universitaria 1200	Comas	2026-09-02	1	29.10
+id_venta	fecha_venta	cajero	cliente	tipo_pago	items	total	comprobante
+--------	-----------	------	-------	---------	-----	-----	-----------
+4	2026-10-03 11:20:00	Luis Enrique Mendoza Quispe	Carlos Daniel Salinas Cárdenas	TARJETA	3	44.60	BOLETA B001-00000004
+id_detalle	producto	numero_lote	cantidad	precio_unitario	subtotal
+----------	--------	-----------	--------	---------------	--------
+6	Aceite vegetal 1 L	LT-ACE-2609A	2	9.80	19.60
+7	Leche evaporada 400 g	LT-LEV-2609A	3	4.20	12.60
+8	Atún en trozos 170 g	LT-ATU-2609A	2	6.20	12.40
+id_venta	fecha_venta	cajero	cliente	tipo_pago	items	total	comprobante
+--------	-----------	------	-------	---------	-----	-----	-----------
+1	2026-10-01 08:30:00	Luis Enrique Mendoza Quispe	Juan José Pérez Alva	EFECTIVO	2	29.10	BOLETA B001-00000001
+2	2026-10-01 09:15:00	Karina Paola Ríos Valdivia	María Teresa Gómez Ramos	YAPE	1	18.00	BOLETA B001-00000002
+3	2026-10-02 10:05:00	José Manuel Huamaní Cruz	SIN CLIENTE	EFECTIVO	2	11.00	BOLETA B001-00000003
+4	2026-10-03 11:20:00	Luis Enrique Mendoza Quispe	Carlos Daniel Salinas Cárdenas	TARJETA	3	44.60	BOLETA B001-00000004
+5	2026-10-04 12:05:00	Daniela Acosta Bravo	Rosa Elena Huamán Flores	PLIN	2	17.50	BOLETA B001-00000005
+6	2026-10-05 13:40:00	Martín Ernesto Saavedra Lima	SIN CLIENTE	YAPE	2	19.10	BOLETA B001-00000006
+7	2026-10-06 14:10:00	Karina Paola Ríos Valdivia	Pedro Pablo Quispe Mamani	EFECTIVO	2	17.30	BOLETA B001-00000007
+8	2026-10-07 15:30:00	Silvia Roxana Delgado Ponce	Lucía Fernanda Vargas Chávez	TARJETA	1	86.00	FACTURA F001-00000001
+tipo_comprobante	numero_completo	fecha_emision	id_venta	cliente	ruc_receptor	total
+----------------	---------------	-------------	--------	-------	------------	-----
+FACTURA	F001-00000001	2026-10-07 15:30:00	8	Lucía Fernanda Vargas Chávez	20601234561	86.00
+id_producto	producto	unidades_vendidas	ingreso
+-----------	--------	-----------------	-------
+13	Agua sin gas 625 ml	10	15.00
+12	Gaseosa cola 500 ml	8	20.00
+7	Pan de molde blanco 600 g	6	47.40
+id_venta	fecha_venta	tipo_pago	comprobante	producto	cantidad	precio_unitario	subtotal	total_venta
+--------	-----------	---------	-----------	--------	--------	---------------	--------	-----------
+5	2026-10-04 12:05:00	PLIN	B001-5	Gaseosa cola 3 L	1	12.50	12.50	17.50
+5	2026-10-04 12:05:00	PLIN	B001-5	Gaseosa cola 500 ml	2	2.50	5.00	17.50
+id	prueba	esperado	obtenido	estado	detalle
+--	------	--------	--------	------	-------
+TP-D01	usp_Cliente_Eliminar: elimina un cliente sin ventas	0	0	PASS	NULL
+TP-D02	usp_Cliente_Eliminar: rechaza eliminar un cliente con ventas (cliente 1)	ERROR 50006	ERROR 50006	PASS	No se puede eliminar: el cliente tiene 1 venta(s) registrada(s).
+TP-D03	usp_Cliente_Eliminar: rechaza cliente inexistente	ERROR 50001	ERROR 50001	PASS	El cliente indicado no existe.
+TP-D04	usp_Venta_Anular: anula la venta 20, repone stock (lote 11: 21->22; lote 9: 32->33) y borra comprobante	22|33|0|0	22|33|0|0	PASS	NULL
+TP-D05	usp_Venta_Anular: rechaza venta inexistente	ERROR 50001	ERROR 50001	PASS	La venta indicada no existe.
+TP-D06	usp_Venta_Anular: rechaza a un CAJERO (no autorizado)	ERROR 50010	ERROR 50010	PASS	Solo un ADMIN o SUPERADMIN activo puede anular ventas.
+TP-D07	usp_Venta_Anular: rechaza empleado autorizador inexistente	ERROR 50010	ERROR 50010	PASS	Solo un ADMIN o SUPERADMIN activo puede anular ventas.
+TP-D08	usp_Venta_Anular: una venta nueva anulada deja el stock como estaba (lote 1: 35)	35|0	35|0	PASS	NULL
+TP-I01	usp_Categoria_Insertar: inserta una categoría válida	1	1	PASS	NULL
+TP-I02	usp_Categoria_Insertar: rechaza nombre duplicado	ERROR 50002	ERROR 50002	PASS	Ya existe una categoría con ese nombre.
+TP-I03	usp_Categoria_Insertar: rechaza tipo inválido	ERROR 50005	ERROR 50005	PASS	Tipo de categoría inválido. Use ALIMENTO, BEBIDA, LIMPIEZA o GENERAL.
+TP-I04	usp_Producto_Insertar: inserta un producto válido	1	1	PASS	NULL
+TP-I05	usp_Producto_Insertar: rechaza código de barras duplicado	ERROR 50002	ERROR 50002	PASS	Ya existe un producto con ese código de barras.
+TP-I06	usp_Producto_Insertar: rechaza categoría inexistente (FK)	ERROR 50003	ERROR 50003	PASS	La categoría indicada no existe.
+TP-I07	usp_Producto_Insertar: rechaza precio cero	ERROR 50005	ERROR 50005	PASS	El precio de venta debe ser mayor que cero.
+TP-I08	usp_Lote_Insertar: el stock inicial iguala la cantidad recibida	50	50	PASS	NULL
+TP-I09	usp_Lote_Insertar: rechaza producto inexistente (FK)	ERROR 50003	ERROR 50003	PASS	El producto indicado no existe.
+TP-I10	usp_Lote_Insertar: rechaza número de lote repetido	ERROR 50002	ERROR 50002	PASS	Ya existe ese número de lote para el producto.
+TP-I11	usp_Lote_Insertar: rechaza cantidad cero	ERROR 50005	ERROR 50005	PASS	La cantidad recibida debe ser mayor que cero.
+TP-I12	usp_Lote_Insertar: rechaza vencimiento anterior al ingreso	ERROR 50005	ERROR 50005	PASS	La fecha de vencimiento debe ser posterior a la fecha de ingreso.
+TP-I13	usp_Lote_Insertar: rechaza producto INACTIVO	ERROR 50007	ERROR 50007	PASS	No se pueden registrar lotes de un producto INACTIVO.
+TP-I14	usp_Cliente_Insertar: inserta un cliente válido	1	1	PASS	NULL
+TP-I15	usp_Cliente_Insertar: rechaza DNI duplicado	ERROR 50002	ERROR 50002	PASS	Ya existe un cliente con ese DNI.
+TP-I16	usp_Cliente_Insertar: rechaza DNI con letras	ERROR 50005	ERROR 50005	PASS	El DNI debe tener exactamente 8 dígitos numéricos.
+TP-I17	usp_Empleado_Insertar: inserta un empleado válido y activo	1	1	PASS	NULL
+TP-I18	usp_Empleado_Insertar: rechaza DNI duplicado	ERROR 50002	ERROR 50002	PASS	Ya existe un empleado con ese DNI.
+TP-I19	usp_Empleado_Insertar: rechaza usuario duplicado	ERROR 50002	ERROR 50002	PASS	Ya existe un empleado con ese usuario.
+TP-I20	usp_Empleado_Insertar: rechaza rol inválido	ERROR 50005	ERROR 50005	PASS	Rol inválido. Use SUPERADMIN, ADMIN o CAJERO.
+TP-I21	usp_Empleado_Insertar: rechaza contraseña en texto plano	ERROR 50005	ERROR 50005	PASS	La clave debe enviarse como hash PBKDF2 (nunca en texto plano).
+TP-I22	usp_Venta_Registrar: total, stock descontado (lote 1: 35->33; lote 13: 50->44)	52.00|33|44	52.00|33|44	PASS	NULL
+TP-I23	usp_Venta_Registrar: emite la boleta en la misma transacción (B001-18)	B001-18	B001-18	PASS	NULL
+TP-I24	usp_Venta_Registrar: total = suma de subtotales y precio vigente conservado	1|21.50	1|21.50	PASS	NULL
+TP-I25	usp_Venta_Registrar: rechaza vender más que el stock (lote 16 tiene 5)	ERROR 50004	ERROR 50004	PASS	Stock insuficiente en el lote 16 (LT-CAF-2609A): disponible 5, solicitado 6.
+TP-I26	usp_Venta_Registrar: rechaza lote vencido (lote 7)	ERROR 50009	ERROR 50009	PASS	No se puede vender mercadería de un lote vencido.
+TP-I27	usp_Venta_Registrar: rechaza empleado inactivo (id 17)	ERROR 50008	ERROR 50008	PASS	El empleado está inactivo y no puede registrar ventas.
+TP-I28	usp_Venta_Registrar: rechaza empleado inexistente (FK)	ERROR 50003	ERROR 50003	PASS	El empleado indicado no existe.
+TP-I29	usp_Venta_Registrar: rechaza cliente inexistente (FK)	ERROR 50003	ERROR 50003	PASS	El cliente indicado no existe.
+TP-I30	usp_Venta_Registrar: rechaza cantidad cero	ERROR 50005	ERROR 50005	PASS	Las cantidades deben ser mayores que cero.
+TP-I31	usp_Venta_Registrar: rechaza venta sin líneas	ERROR 50005	ERROR 50005	PASS	La venta debe tener al menos una línea.
+TP-I32	usp_Venta_Registrar: rechaza lote inexistente (FK)	ERROR 50003	ERROR 50003	PASS	Alguno de los lotes indicados no existe.
+TP-I33	usp_Venta_Registrar: rechaza medio de pago inválido	ERROR 50005	ERROR 50005	PASS	Medio de pago inválido. Use EFECTIVO, YAPE, PLIN o TARJETA.
+TP-I34	usp_Venta_Registrar: atomicidad (falla la factura sin RUC y se revierte venta, detalle y stock)	ATOMICO	ATOMICO	PASS	NULL
+TP-I35	usp_DetalleVenta_Agregar: agrega línea, descuenta stock y recalcula total	32.90|55	32.90|55	PASS	NULL
+TP-I36	usp_DetalleVenta_Agregar: rechaza venta que ya tiene comprobante (venta 1)	ERROR 50007	ERROR 50007	PASS	La venta ya tiene comprobante emitido; no se puede modificar.
+TP-I37	usp_DetalleVenta_Agregar: rechaza línea repetida del mismo lote	ERROR 50002	ERROR 50002	PASS	La venta ya tiene una línea para ese lote.
+TP-I38	usp_DetalleVenta_Agregar: rechaza cantidad mayor al stock	ERROR 50004	ERROR 50004	PASS	Stock insuficiente en el lote 16: disponible 5, solicitado 6.
+TP-I39	usp_DetalleVenta_Agregar: rechaza venta inexistente (FK)	ERROR 50003	ERROR 50003	PASS	La venta indicada no existe.
+TP-I40	usp_Comprobante_Emitir: boleta con el siguiente correlativo (B001-18)	B001-18	B001-18	PASS	NULL
+TP-I41	usp_Comprobante_Emitir: factura con RUC y siguiente correlativo (F001-4)	F001-4|20601234561	F001-4|20601234561	PASS	NULL
+TP-I42	usp_Comprobante_Emitir: rechaza segundo comprobante para la misma venta (venta 1)	ERROR 50002	ERROR 50002	PASS	La venta ya tiene un comprobante emitido.
+TP-I43	usp_Comprobante_Emitir: rechaza factura sin RUC	ERROR 50005	ERROR 50005	PASS	La factura exige un RUC de 11 dígitos que empiece con 10 o 20.
+TP-I44	usp_Comprobante_Emitir: rechaza boleta con RUC	ERROR 50005	ERROR 50005	PASS	La boleta no admite RUC del receptor.
+TP-I45	usp_Comprobante_Emitir: rechaza venta inexistente (FK)	ERROR 50003	ERROR 50003	PASS	La venta indicada no existe.
+TP-I46	usp_Comprobante_Emitir: rechaza RUC mal formado (empieza con 30)	ERROR 50005	ERROR 50005	PASS	La factura exige un RUC de 11 dígitos que empiece con 10 o 20.
+TP-S01	usp_Producto_Buscar: búsqueda por texto «gaseosa» devuelve 2 productos	2	2	PASS	NULL
+TP-S02	usp_Producto_Buscar: búsqueda por código de barras exacto devuelve 1 producto	1	1	PASS	NULL
+TP-S03	usp_Producto_Buscar: texto sin coincidencias devuelve 0 filas (sin error)	0	0	PASS	NULL
+TP-S04	usp_Stock_Consultar: el arroz (producto 1) tiene 2 lotes	2	2	PASS	NULL
+TP-S05	usp_Stock_Consultar: rechaza producto inexistente	ERROR 50001	ERROR 50001	PASS	El producto indicado no existe.
+TP-S06	usp_Productos_StockBajo: 4 productos agotados o en alerta	4	4	PASS	NULL
+TP-S07	usp_Lotes_PorVencer: con 10000 días devuelve los 19 lotes perecibles con stock	19	19	PASS	NULL
+TP-S08	usp_Lotes_PorVencer: rechaza días negativos	ERROR 50005	ERROR 50005	PASS	El número de días no puede ser negativo.
+TP-S09	usp_Cliente_BuscarPorDni: encuentra al cliente 10234567	1	1	PASS	NULL
+TP-S10	usp_Cliente_BuscarPorDni: DNI inexistente	ERROR 50001	ERROR 50001	PASS	No existe un cliente con ese DNI.
+TP-S11	usp_Cliente_BuscarPorDni: DNI con formato inválido	ERROR 50005	ERROR 50005	PASS	El DNI debe tener exactamente 8 dígitos numéricos.
+TP-S12	usp_Venta_Detalle: la venta 4 tiene 3 líneas	3	3	PASS	NULL
+TP-S13	usp_Venta_Detalle: rechaza venta inexistente	ERROR 50001	ERROR 50001	PASS	La venta indicada no existe.
+TP-S14	usp_Ventas_PorRango: del 01 al 07 de octubre hay 8 ventas	8	8	PASS	NULL
+TP-S15	usp_Ventas_PorRango: rechaza rango invertido	ERROR 50005	ERROR 50005	PASS	El rango de fechas es inválido: la fecha inicial no puede ser mayor que la final.
+TP-S16	usp_Comprobante_Consultar: encuentra la factura F001-1	1	1	PASS	NULL
+TP-S17	usp_Comprobante_Consultar: comprobante inexistente	ERROR 50001	ERROR 50001	PASS	No existe un comprobante con esa serie y número.
+TP-S18	usp_Productos_MasVendidos: top 3	3	3	PASS	NULL
+TP-S19	usp_Productos_MasVendidos: rechaza top = 0	ERROR 50005	ERROR 50005	PASS	El valor de top debe ser mayor que cero.
+TP-S20	usp_Cliente_HistorialCompras: el cliente 4 tiene 2 líneas compradas	2	2	PASS	NULL
+TP-S21	usp_Cliente_HistorialCompras: rechaza cliente inexistente	ERROR 50001	ERROR 50001	PASS	El cliente indicado no existe.
+TP-U01	usp_Producto_ActualizarPrecio: actualiza el precio (producto 3 -> 10.50)	10.50	10.50	PASS	NULL
+TP-U02	usp_Producto_ActualizarPrecio: rechaza producto inexistente	ERROR 50001	ERROR 50001	PASS	El producto indicado no existe.
+TP-U03	usp_Producto_ActualizarPrecio: rechaza precio cero	ERROR 50005	ERROR 50005	PASS	El precio nuevo debe ser mayor que cero.
+TP-U04	usp_Producto_ActualizarPrecio: rechaza precio menor al costo (arroz costo 18.50)	ERROR 50005	ERROR 50005	PASS	El precio de venta no puede ser menor que el costo unitario de los lotes en stock.
+TP-U05	usp_Producto_ActualizarPrecio: las ventas históricas conservan su precio (RN-09)	9.80	9.80	PASS	NULL
+TP-U06	usp_Producto_CambiarEstado: reactiva el producto 20	ACTIVO	ACTIVO	PASS	NULL
+TP-U07	usp_Producto_CambiarEstado: rechaza el mismo estado	ERROR 50007	ERROR 50007	PASS	El producto ya se encuentra en ese estado.
+TP-U08	usp_Producto_CambiarEstado: rechaza estado inválido	ERROR 50005	ERROR 50005	PASS	Estado inválido. Use ACTIVO o INACTIVO.
+TP-U09	usp_Producto_CambiarEstado: rechaza producto inexistente	ERROR 50001	ERROR 50001	PASS	El producto indicado no existe.
+TP-U10	usp_Cliente_ActualizarContacto: cambia teléfono y conserva el resto	987654000|Independencia	987654000|Independencia	PASS	NULL
+TP-U11	usp_Cliente_ActualizarContacto: rechaza cliente inexistente	ERROR 50001	ERROR 50001	PASS	El cliente indicado no existe.
+TP-U12	usp_Cliente_ActualizarContacto: rechaza teléfono que no empieza con 9	ERROR 50005	ERROR 50005	PASS	El teléfono debe tener 9 dígitos y empezar con 9.
+TP-U13	usp_Empleado_CambiarEstado: desactiva al empleado 19	0	0	PASS	NULL
+TP-U14	usp_Empleado_CambiarEstado: rechaza el mismo estado	ERROR 50007	ERROR 50007	PASS	El empleado ya se encuentra en ese estado.
+TP-U15	usp_Empleado_CambiarEstado: protege al único SUPERADMIN activo	ERROR 50007	ERROR 50007	PASS	No se puede desactivar al único SUPERADMIN activo.
+TP-U16	usp_Empleado_CambiarEstado: rechaza empleado inexistente	ERROR 50001	ERROR 50001	PASS	El empleado indicado no existe.
+TP-U17	usp_Lote_AjustarStock: merma de 2 unidades (lote 13: 50 -> 48)	48	48	PASS	NULL
+TP-U18	usp_Lote_AjustarStock: rechaza ajuste que deja stock negativo (lote 16 tiene 5)	ERROR 50004	ERROR 50004	PASS	El ajuste dejaría el stock del lote en negativo.
+TP-U19	usp_Lote_AjustarStock: rechaza stock superior a lo recibido (lote 1: 35 + 6 > 40)	ERROR 50005	ERROR 50005	PASS	El stock resultante no puede superar la cantidad recibida del lote.
+TP-U20	usp_Lote_AjustarStock: rechaza lote inexistente	ERROR 50001	ERROR 50001	PASS	El lote indicado no existe.
+TP-U21	usp_Lote_AjustarStock: rechaza ajuste cero	ERROR 50005	ERROR 50005	PASS	El ajuste no puede ser cero.
+TP-U22	usp_Venta_CambiarMedioPago: venta 1 de EFECTIVO a YAPE	YAPE|29.10	YAPE|29.10	PASS	NULL
+TP-U23	usp_Venta_CambiarMedioPago: rechaza medio de pago inválido	ERROR 50005	ERROR 50005	PASS	Medio de pago inválido. Use EFECTIVO, YAPE, PLIN o TARJETA.
+TP-U24	usp_Venta_CambiarMedioPago: rechaza venta inexistente	ERROR 50001	ERROR 50001	PASS	La venta indicada no existe.
+TP-U25	usp_Venta_CambiarMedioPago: rechaza el mismo medio de pago	ERROR 50007	ERROR 50007	PASS	La venta ya tiene ese medio de pago.
+TP-Z01	La base queda intacta después de todas las pruebas (conteo de las 8 tablas)	20|20|21|20|20|20|37|20	20|20|21|20|20|20|37|20	PASS	NULL
+pruebas	aprobadas	fallidas
+-------	---------	--------
+101	101	0

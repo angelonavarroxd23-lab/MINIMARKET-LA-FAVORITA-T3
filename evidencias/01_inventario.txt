@@ -1,0 +1,99 @@
+﻿Changed database context to 'MinimarketLaFavorita'.
+@@RES INV_BD
+servidor	base_de_datos	version_sql_server	edicion	fecha_creacion	collation
+--------	-------------	------------------	-------	--------------	---------
+equipo-local	MinimarketLaFavorita	16.0.1000.6	Enterprise Evaluation Edition (64-bit)	2026-11-12 01:59:31.907	Modern_Spanish_CI_AS
+
+(1 rows affected)
+@@RES INV_TABLAS
+tabla	columnas	filas
+-----	--------	-----
+Categoria	4	20
+Cliente	8	20
+Comprobante	7	20
+Detalle_Venta	6	37
+Empleado	11	20
+Lote	8	21
+Producto	8	20
+Venta	6	20
+
+(8 rows affected)
+@@RES INV_RESTRICCIONES
+tipo	cantidad
+----	--------
+PRIMARY KEY	8
+UNIQUE	10
+FOREIGN KEY	7
+CHECK	23
+DEFAULT	6
+
+(5 rows affected)
+@@RES INV_FK
+clave_foranea	tabla_hija	tabla_padre	estado
+-------------	----------	-----------	------
+FK_Comprobante_Venta	Comprobante	Venta	confiable
+FK_Detalle_Lote	Detalle_Venta	Lote	confiable
+FK_Detalle_Venta	Detalle_Venta	Venta	confiable
+FK_Lote_Producto	Lote	Producto	confiable
+FK_Producto_Categoria	Producto	Categoria	confiable
+FK_Venta_Cliente	Venta	Cliente	confiable
+FK_Venta_Empleado	Venta	Empleado	confiable
+
+(7 rows affected)
+@@RES INV_VISTAS
+vista
+-----
+vw_clientes_frecuentes
+vw_comprobantes_emitidos
+vw_control_integridad_ventas
+vw_detalle_ventas
+vw_empleados_seguros
+vw_lotes_vencimiento
+vw_margen_producto
+vw_ranking_productos
+vw_rendimiento_empleados
+vw_reposicion_urgente
+vw_stock_producto
+vw_valor_inventario_categoria
+vw_ventas_cabecera
+vw_ventas_diarias
+vw_ventas_medio_pago
+
+(15 rows affected)
+@@RES INV_PROCEDIMIENTOS
+tipo	procedimiento	parametros
+----	-------------	----------
+INSERT	usp_Categoria_Insertar	4
+INSERT	usp_Cliente_Insertar	7
+INSERT	usp_Comprobante_Emitir	4
+INSERT	usp_DetalleVenta_Agregar	4
+INSERT	usp_Empleado_Insertar	10
+INSERT	usp_Lote_Insertar	7
+INSERT	usp_Producto_Insertar	8
+INSERT	usp_Venta_Registrar	7
+UPDATE	usp_Cliente_ActualizarContacto	4
+UPDATE	usp_Empleado_CambiarEstado	2
+UPDATE	usp_Lote_AjustarStock	3
+UPDATE	usp_Producto_ActualizarPrecio	2
+UPDATE	usp_Producto_CambiarEstado	2
+UPDATE	usp_Venta_CambiarMedioPago	2
+DELETE	usp_Cliente_Eliminar	1
+DELETE	usp_Venta_Anular	2
+SELECT	usp_Cliente_BuscarPorDni	1
+SELECT	usp_Cliente_HistorialCompras	1
+SELECT	usp_Comprobante_Consultar	2
+SELECT	usp_Lotes_PorVencer	1
+SELECT	usp_Producto_Buscar	3
+SELECT	usp_Productos_MasVendidos	3
+SELECT	usp_Productos_StockBajo	1
+SELECT	usp_Stock_Consultar	1
+SELECT	usp_Venta_Detalle	1
+SELECT	usp_Ventas_PorRango	3
+
+(26 rows affected)
+@@RES INV_RESUMEN
+tablas	vistas	procedimientos	tipos_tabla
+------	------	--------------	-----------
+8	15	26	1
+
+(1 rows affected)

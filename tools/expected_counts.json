@@ -1,0 +1,7 @@
+{
+ "S01": 8, "S02": 1, "S03": 5, "S04": 7, "S05": 7, "S06": 5, "S07": 1, "S08": 2,
+ "S09": "=(SELECT COUNT(DISTINCT id_producto) FROM Lote WHERE stock_actual > 0 AND fecha_vencimiento IS NOT NULL AND fecha_vencimiento <= DATEADD(DAY, 30, CAST(GETDATE() AS DATE)))",
+ "S10": 2, "S11": 20, "S12": 15, "S13": 2, "S14": 7, "S15": 14,
+ "M01": 20, "M02": 21, "M03": 37, "M04": 16, "M05": 20, "M06": 30, "M07": 3, "M08": 3, "M09": 17, "M10": 20,
+ "M11": 20, "M12": 20, "M13": 20, "M14": 21, "M15": 39, "M16": 21, "M17": 27, "M18": 25, "M19": 20, "M20": 22
+}

@@ -1,0 +1,30 @@
+﻿Changed database context to 'MinimarketLaFavorita'.
+Warning: Null value is eliminated by an aggregate or other SET operation.
+Warning: Null value is eliminated by an aggregate or other SET operation.
+Warning: Null value is eliminated by an aggregate or other SET operation.
+id	prueba	esperado	obtenido	estado
+--	------	--------	--------	------
+TV-00	Existen exactamente 15 vistas vw_	15	15	PASS
+TV-01	vw_stock_producto: 20 productos	20	20	PASS
+TV-02	vw_stock_producto: 1 agotado, 3 en alerta	1|3	1|3	PASS
+TV-03	vw_reposicion_urgente: 4 productos a reponer	4	4	PASS
+TV-04	vw_lotes_vencimiento: 19 lotes perecibles con stock	19	19	PASS
+TV-05	vw_lotes_vencimiento: lotes 6, 7 y 8 aparecen como VENCIDO	3	3	PASS
+TV-06	vw_valor_inventario_categoria: 20 categorías	20	20	PASS
+TV-07	vw_valor_inventario_categoria: unidades = SUM(stock) de Lote	1	1	PASS
+TV-08	vw_detalle_ventas: 37 líneas	37	37	PASS
+TV-09	vw_detalle_ventas: suma de subtotales = suma de totales de venta	1	1	PASS
+TV-10	vw_ventas_cabecera: 20 ventas, 4 sin cliente	20|4	20|4	PASS
+TV-11	vw_ventas_medio_pago: 4 medios y 100 % del ingreso	4|100.00	4|100.00	PASS
+TV-12	vw_ventas_diarias: 18 días con ventas	18	18	PASS
+TV-13	vw_ventas_diarias: suma diaria = suma de ventas	1	1	PASS
+TV-14	vw_ranking_productos: 19 productos vendidos; el primero es el agua (10 u.)	19|10	19|10	PASS
+TV-15	vw_rendimiento_empleados: 20 empleados	20	20	PASS
+TV-16	vw_clientes_frecuentes: 20 clientes, 5 sin compras	20|5	20|5	PASS
+TV-17	vw_comprobantes_emitidos: 20 comprobantes (3 facturas)	20|3	20|3	PASS
+TV-18	vw_margen_producto: 19 productos y margen total positivo	19|1	19|1	PASS
+TV-19	vw_empleados_seguros: 20 empleados y SIN columna clave_hash ni dni	20|0	20|0	PASS
+TV-20	vw_control_integridad_ventas: las 20 ventas están OK	20|0	20|0	PASS
+pruebas	aprobadas	fallidas
+-------	---------	--------
+21	21	0

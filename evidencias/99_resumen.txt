@@ -1,0 +1,17 @@
+﻿01_create_database           codigo de salida 0
+02_create_tables             codigo de salida 0
+03_insert_data               codigo de salida 0
+04_views                     codigo de salida 0
+05_subqueries                codigo de salida 0
+06_multitable_queries        codigo de salida 0
+07_procedures_insert         codigo de salida 0
+08_procedures_update         codigo de salida 0
+09_procedures_delete         codigo de salida 0
+10_procedures_select         codigo de salida 0
+ejercicios                   codigo de salida 0
+integridad                   codigo de salida 0
+inventario                   codigo de salida 0
+test_integrity               codigo de salida 0
+test_procedures              codigo de salida 0
+test_queries                 codigo de salida 0
+test_views                   codigo de salida 0

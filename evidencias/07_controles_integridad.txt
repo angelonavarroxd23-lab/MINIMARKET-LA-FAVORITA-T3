@@ -1,0 +1,21 @@
+﻿Changed database context to 'MinimarketLaFavorita'.
+codigo	regla	descripcion	violaciones	estado
+------	-----	-----------	-----------	------
+I01	RN-04	Lotes con stock negativo	0	OK
+I02	RN-04	Lotes con stock mayor que la cantidad recibida	0	OK
+I03	RN-04	Lotes cuyo stock no cuadra con lo recibido menos lo vendido	0	OK
+I04	RN-06	Ventas sin líneas de detalle	0	OK
+I05	RN-09	Ventas cuyo total no es la suma de sus subtotales	0	OK
+I06	RN-09	Líneas cuyo subtotal no es cantidad por precio unitario	0	OK
+I07	RN-08	Ventas sin comprobante	0	OK
+I08	RN-08	Comprobantes sin venta asociada	0	OK
+I09	RN-08	Ventas con más de un comprobante	0	OK
+I10	RN-08	Facturas sin RUC o boletas con RUC	0	OK
+I11	RN-08	Series con numeración no correlativa (huecos o repetidos)	0	OK
+I12	RN-08	Comprobantes emitidos antes de la fecha de la venta	0	OK
+I13	FK	Referencias huérfanas (detalle, venta, lote, producto)	0	OK
+I14	FK	Claves foráneas o restricciones CHECK deshabilitadas / no confiables	0	OK
+I15	FK/CK	Filas que violan alguna restricción (DBCC CHECKCONSTRAINTS)	0	OK
+I16	T2-I6	Ventas a clientes registrados después de la fecha de venta	0	OK
+I17	RN-10	Ventas registradas por empleados inexistentes	0	OK
+Integridad verificada: 17 controles, 0 violaciones.

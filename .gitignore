@@ -1,0 +1,12 @@
+# Registros locales de CI y archivos temporales
+evidencias_ci/
+evidencias/ci_log.txt
+*.bak
+*.mdf
+*.ldf
+*.tmp
+~$*
+# Credenciales: nunca se versionan
+.env
+*.pfx
+secrets*
