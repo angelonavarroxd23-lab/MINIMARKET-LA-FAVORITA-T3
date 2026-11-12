@@ -13,6 +13,14 @@ Sistema de gestión de ventas y control de inventario para un minimarket de Coma
 vistas, subconsultas, consultas multitabla y procedimientos almacenados sobre el modelo de **8 tablas** del T2
 (`Categoria`, `Producto`, `Lote`, `Cliente`, `Empleado`, `Venta`, `Detalle_Venta`, `Comprobante`), sin cambios al modelo.
 
+[![Pruebas SQL Server](https://github.com/angelonavarroxd23-lab/MINIMARKET-LA-FAVORITA-T3/actions/workflows/sqlserver-tests.yml/badge.svg)](https://github.com/angelonavarroxd23-lab/MINIMARKET-LA-FAVORITA-T3/actions/workflows/sqlserver-tests.yml)
+
+## ▶ Ejecutar todo en GitHub (sin instalar nada)
+
+**[Abrir el flujo «sqlserver-tests» →](https://github.com/angelonavarroxd23-lab/MINIMARKET-LA-FAVORITA-T3/actions/workflows/sqlserver-tests.yml)** y pulsar **Run workflow** (botón a la derecha) → **Run workflow**.
+GitHub levanta SQL Server 2022, crea la base, carga los datos, crea las 15 vistas y los 26 procedimientos y ejecuta las pruebas. Al terminar (1 a 2 minutos) se abre la ejecución y se ve el resultado paso a paso; el registro completo queda como artefacto `ci_log`.
+(Hace falta haber iniciado sesión en GitHub; los usuarios con acceso de escritura al repositorio pueden ejecutarlo.)
+
 **Autor:** Romero Napanga Walter · **Motor:** Microsoft SQL Server 2022 (T-SQL) · **Licencia:** MIT
 
 ## Contenido de la entrega
